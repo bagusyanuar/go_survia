@@ -22,5 +22,8 @@ func (AuthAdmin) SignIn(c *gin.Context) {
 	}
 
 	user, err := repository.SignIn()
-	
+	if err != nil {
+			
+	}
+
 }
