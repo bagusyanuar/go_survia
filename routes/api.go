@@ -1,6 +1,7 @@
 package routes
 
 import (
+	AdminController "go-survia/src/controller/admin"
 	AuthController "go-survia/src/controller/auth"
 	"go-survia/src/controller/user"
 	"net/http"
@@ -26,6 +27,7 @@ func InitRoutes() *gin.Engine {
 	})
 
 	authController := AuthController.AuthAdmin{}
+	categoryController := AdminController.Category{}
 	api := route.Group("/api")
 	{
 		v1 := api.Group("/v1")
@@ -40,8 +42,16 @@ func InitRoutes() *gin.Engine {
 					auth_admin.POST("/sign-in", authController.SignIn)
 				}
 			}
+
+			admin := v1.Group("/admin")
+			{
+				category := admin.Group("/category")
+				{
+					category.GET("", categoryController.Index)
+				}
+			}
 		}
-		
+
 	}
 	return route
 }

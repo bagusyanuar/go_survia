@@ -24,7 +24,7 @@ func main() {
 
 	// database.Migrate()
 	// database.Seed()
-	log.Println("success migrate database")
+	// log.Println("success migrate database")
 
 	appPort := os.Getenv("APP_PORT")
 	server := routes.InitRoutes()
