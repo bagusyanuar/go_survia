@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"go-survia/database"
+	"go-survia/routes"
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -19,11 +22,12 @@ func main() {
 	}
 	log.Println("success connect to database")
 
-	database.Migrate()
+	// database.Migrate()
+	// database.Seed()
 	log.Println("success migrate database")
 
-	// appPort := os.Getenv("APP_PORT")
-	// server := routes.InitRoutes()
-	// port := fmt.Sprintf(":%s", appPort)
-	// server.Run(port)
+	appPort := os.Getenv("APP_PORT")
+	server := routes.InitRoutes()
+	port := fmt.Sprintf(":%s", appPort)
+	server.Run(port)
 }

@@ -23,3 +23,7 @@ func (admin *Admin) BeforeCreate(tx *gorm.DB) (err error) {
 	admin.UpdatedAt = time.Now()
 	return
 }
+
+func (Admin) TableName() string {
+	return "admins"
+}
