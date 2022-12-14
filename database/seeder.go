@@ -42,7 +42,7 @@ func Seed() {
 
 	admin := adminUser{
 		Admin: model.Admin{
-			Name: name,
+			Name:     name,
 			IsActive: true,
 		},
 		User: user,

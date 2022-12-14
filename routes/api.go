@@ -3,6 +3,7 @@ package routes
 import (
 	AdminController "go-survia/src/controller/admin"
 	AuthController "go-survia/src/controller/auth"
+	MemberController "go-survia/src/controller/member"
 	"go-survia/src/controller/user"
 	"net/http"
 
@@ -27,7 +28,8 @@ func InitRoutes() *gin.Engine {
 	})
 
 	authController := AuthController.AuthAdmin{}
-	categoryController := AdminController.Category{}
+	adminCategoryController := AdminController.Category{}
+	memberCategoryController := MemberController.Category{}
 	api := route.Group("/api")
 	{
 		v1 := api.Group("/v1")
@@ -47,7 +49,17 @@ func InitRoutes() *gin.Engine {
 			{
 				category := admin.Group("/category")
 				{
-					category.GET("", categoryController.Index)
+					category.GET("", adminCategoryController.Index)
+					category.POST("", adminCategoryController.Index)
+					category.GET("/:id", adminCategoryController.FindByID)
+				}
+			}
+
+			member := v1.Group("/member")
+			{
+				category := member.Group("/category")
+				{
+					category.GET("", memberCategoryController.Index)
 				}
 			}
 		}
