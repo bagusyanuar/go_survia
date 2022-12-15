@@ -23,8 +23,8 @@ type apiResponse struct {
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
 }
 
-var listResponse []apiResponse
-var response *apiResponse
+var listCategory []apiResponse
+var category *apiResponse
 
 func (Category) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
@@ -66,6 +66,43 @@ func (Category) Index(c *gin.Context) {
 
 func (Category) FindByID(c *gin.Context) {
 	id := c.Param("id")
+	if c.Request.Method == "POST" {
+		name := c.PostForm("name")
+		data := map[string]interface{}{
+			"name": name,
+		}
+		err := patch(id, data)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+				Code:    http.StatusInternalServerError,
+				Data:    nil,
+				Message: err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, lib.Response{
+			Code:    http.StatusOK,
+			Message: "success",
+		})
+		return
+	}
+
+	if c.Request.Method == "DELETE" {
+		err := delete(id)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+				Code:    http.StatusInternalServerError,
+				Data:    nil,
+				Message: err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, lib.Response{
+			Code:    http.StatusOK,
+			Message: "success",
+		})
+		return
+	}
 	result, err := findById(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -92,10 +129,11 @@ func (Category) FindByID(c *gin.Context) {
 
 //logical
 func findAll(q string) (r []apiResponse, err error) {
-	if err = database.DB.Model(&model.Category{}).Where("name LIKE ?", "%"+q+"%").Find(&listResponse).Error; err != nil {
-		return listResponse, err
+	//unscoped for show deleted item
+	if err = database.DB.Unscoped().Model(&model.Category{}).Where("name LIKE ?", "%"+q+"%").Find(&listCategory).Error; err != nil {
+		return listCategory, err
 	}
-	return listResponse, nil
+	return listCategory, nil
 }
 
 func create(d model.Category) (err error) {
@@ -106,14 +144,21 @@ func create(d model.Category) (err error) {
 }
 
 func findById(id string) (r *apiResponse, err error) {
-	if err = database.DB.Model(&model.Category{}).First(&response, "id = ?", id).Error; err != nil {
-		return response, err
+	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
+		return category, err
 	}
-	return response, nil
+	return category, nil
 }
 
-func patch(category *model.Category, data interface{}) (err error) {
-	if err = database.DB.Model(&category).Updates(data).Error; err != nil {
+func patch(id string, data interface{}) (err error) {
+	if err = database.DB.Model(&model.Category{}).Where("id = ?", id).Updates(data).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func delete(id string) (err error) {
+	if err = database.DB.Where("id = ?", id).Delete(&model.Category{}).Error; err != nil {
 		return err
 	}
 	return nil

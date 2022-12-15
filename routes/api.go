@@ -52,6 +52,8 @@ func InitRoutes() *gin.Engine {
 					category.GET("", adminCategoryController.Index)
 					category.POST("", adminCategoryController.Index)
 					category.GET("/:id", adminCategoryController.FindByID)
+					category.POST("/:id", adminCategoryController.FindByID)
+					category.DELETE("/:id", adminCategoryController.FindByID)
 				}
 			}
 
