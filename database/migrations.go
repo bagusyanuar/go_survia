@@ -160,10 +160,10 @@ type Campaign struct {
 	Title            string         `gorm:"type:varchar(255);not null" json:"title"`
 	Description      string         `gorm:"type:text;not null" json:"description"`
 	ShortDescription string         `gorm:"type:text;not null" json:"short_description"`
-	Image            string         `gorm:"type:text;" json:"image"`
-	StartAt          datatypes.Date `gorm:"column:start_at;type:date;not null;" json:"start_at"`
-	FinishAt         datatypes.Date `gorm:"column:finish_at;type:date;not null;" json:"finish_at"`
-	Status           uint           `gorm:"column:finish_at;type:smallint(6);not null;" json:"status"`
+	Image            *string         `gorm:"type:text;" json:"image"`
+	StartAt          *datatypes.Date `gorm:"column:start_at;type:date;" json:"start_at"`
+	FinishAt         *datatypes.Date `gorm:"column:finish_at;type:date;" json:"finish_at"`
+	Status           uint           `gorm:"column:status;type:smallint(6);not null;" json:"status"`
 	Background       string         `gorm:"type:varchar(255);not null" json:"background"`
 	CreatedAt        time.Time      `gorm:"column:created_at;not null" json:"created_at"`
 	UpdatedAt        time.Time      `gorm:"column:updated_at;not null" json:"updated_at"`
@@ -183,4 +183,6 @@ func Migrate() {
 	DB.AutoMigrate(&Admin{})
 	DB.AutoMigrate(&Member{})
 	DB.AutoMigrate(&Campaign{})
+	DB.Exec("ALTER TABLE `campaigns` CHANGE `start_at` `start_at` DATE NULL;")
+	DB.Exec("ALTER TABLE `campaigns` CHANGE `finish_at` `finish_at` DATE NULL;")
 }

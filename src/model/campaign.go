@@ -13,9 +13,9 @@ type Campaign struct {
 	Title            string         `json:"title"`
 	Description      string         `json:"description"`
 	ShortDescription string         `json:"short_description"`
-	Image            string         `json:"image"`
-	StartAt          datatypes.Date `json:"start_at"`
-	FinishAt         datatypes.Date `json:"finish_at"`
+	Image            *string         `json:"image"`
+	StartAt          *datatypes.Date `json:"start_at"`
+	FinishAt         *datatypes.Date `json:"finish_at"`
 	Status           uint           `json:"status"`
 	Background       string         `json:"background"`
 	CreatedAt        time.Time      `json:"created_at"`
