@@ -22,7 +22,7 @@ func main() {
 	}
 	log.Println("success connect to database")
 
-	database.Migrate()
+	// database.Migrate()
 	// database.Seed()
 	// log.Println("success migrate database")
 

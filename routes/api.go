@@ -31,7 +31,6 @@ func InitRoutes() *gin.Engine {
 	adminCategoryController := AdminController.Category{}
 	adminCampaignController := AdminController.Campaign{}
 
-
 	memberCategoryController := MemberController.Category{}
 	api := route.Group("/api")
 	{
@@ -63,6 +62,9 @@ func InitRoutes() *gin.Engine {
 				{
 					campaign.GET("", adminCampaignController.Index)
 					campaign.POST("", adminCampaignController.Index)
+					campaign.GET("/:id", adminCampaignController.FindByID)
+					campaign.POST("/:id", adminCampaignController.FindByID)
+					campaign.DELETE("/:id", adminCampaignController.FindByID)
 				}
 			}
 
