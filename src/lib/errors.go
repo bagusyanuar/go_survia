@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -43,4 +44,16 @@ func ErrorSignIn(err error) Response {
 			Message: "error while sign in " + err.Error(),
 		}
 	}
+}
+
+func ErrorMessageValidation(err error) []map[string]interface{} {
+	results := []map[string]interface{}{}
+	for _, err := range err.(validator.ValidationErrors) {
+		tmp := map[string]interface{}{
+			"key":     err.Field(),
+			"message": err.Tag(),
+		}
+		results = append(results, tmp)
+	}
+	return results
 }

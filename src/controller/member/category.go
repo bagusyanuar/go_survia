@@ -1,26 +1,20 @@
 package member
 
 import (
-	"go-survia/database"
 	"go-survia/src/lib"
-	"go-survia/src/model"
+	"go-survia/src/repositories"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
 )
 
 type Category struct{}
 
-type response struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-}
-
-var data []response
+var categoryRepository repositories.Category
 
 func (Category) Index(c *gin.Context) {
-	results, err := findAll()
+	q := c.Query("q")
+	data, err := categoryRepository.GetCategories(q)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
@@ -32,14 +26,6 @@ func (Category) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
 		Message: "success",
-		Data:    results,
+		Data:    data,
 	})
-}
-
-//repositories
-func findAll() (r []response, err error) {
-	if err = database.DB.Model(&model.Category{}).Find(&data).Error; err != nil {
-		return data, err
-	}
-	return data, nil
 }
