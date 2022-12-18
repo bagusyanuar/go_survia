@@ -65,7 +65,7 @@ func InitRoutes() *gin.Engine {
 					campaign.GET("", adminCampaignController.Index)
 					campaign.POST("", adminCampaignController.Index)
 					campaign.GET("/:id", adminCampaignController.FindByID)
-					campaign.POST("/:id", adminCampaignController.FindByID)
+					campaign.PATCH("/:id", adminCampaignController.FindByID)
 					campaign.DELETE("/:id", adminCampaignController.FindByID)
 				}
 				bank := admin.Group("/bank")

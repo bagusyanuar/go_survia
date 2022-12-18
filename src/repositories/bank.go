@@ -7,17 +7,16 @@ import (
 
 type Bank struct{}
 
-var listBanks []model.Bank
-var bank *model.Bank
-
 func (Bank) All(q string) (b []model.Bank, err error) {
-	if err = database.DB.Unscoped().Model(&model.Bank{}).Where("name LIKE ?", "%"+q+"%").Find(&listBanks).Error; err != nil {
-		return listBanks, err
+	var banks []model.Bank
+	if err = database.DB.Unscoped().Model(&model.Bank{}).Where("name LIKE ?", "%"+q+"%").Find(&banks).Error; err != nil {
+		return banks, err
 	}
-	return listBanks, nil
+	return banks, nil
 }
 
 func (Bank) FindByID(id string) (r *model.Bank, err error) {
+	var bank *model.Bank
 	if err = database.DB.Model(&model.Bank{}).First(&bank, "id = ?", id).Error; err != nil {
 		return bank, err
 	}

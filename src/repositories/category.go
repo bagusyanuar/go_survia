@@ -14,13 +14,11 @@ type CategoryResponse struct {
 	Name string    `json:"name"`
 }
 
-var categories []model.Category
-var category *model.Category
-
 var apiCategories []CategoryResponse
 
 //admin
 func (Category) All(q string) (b []model.Category, err error) {
+	var categories []model.Category
 	if err = database.DB.Unscoped().Model(&model.Category{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&categories).Error; err != nil {
 		return categories, err
 	}
@@ -28,6 +26,7 @@ func (Category) All(q string) (b []model.Category, err error) {
 }
 
 func (Category) FindByID(id string) (r *model.Category, err error) {
+	var category *model.Category
 	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
 		return category, err
 	}
