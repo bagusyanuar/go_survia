@@ -32,6 +32,8 @@ func InitRoutes() *gin.Engine {
 	adminCampaignController := AdminController.Campaign{}
 	adminBankController := AdminController.Bank{}
 	adminProvinceController := AdminController.Province{}
+	adminCityController := AdminController.City{}
+	adminJobController := AdminController.Job{}
 
 	memberCategoryController := MemberController.Category{}
 
@@ -85,6 +87,24 @@ func InitRoutes() *gin.Engine {
 					province.GET("/:id", adminProvinceController.FindByID)
 					province.PATCH("/:id", adminProvinceController.FindByID)
 					province.DELETE("/:id", adminProvinceController.FindByID)
+				}
+
+				city := admin.Group("/city")
+				{
+					city.GET("", adminCityController.Index)
+					city.POST("", adminCityController.Index)
+					city.GET("/:id", adminCityController.FindByID)
+					city.PATCH("/:id", adminCityController.FindByID)
+					city.DELETE("/:id", adminCityController.FindByID)
+				}
+
+				job := admin.Group("/job")
+				{
+					job.GET("", adminJobController.Index)
+					job.POST("", adminJobController.Index)
+					job.GET("/:id", adminJobController.FindByID)
+					job.PATCH("/:id", adminJobController.FindByID)
+					job.DELETE("/:id", adminJobController.FindByID)
 				}
 			}
 

@@ -9,26 +9,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type City struct{}
-type cityRequest struct {
-	ProvinceID string `form:"province_id" validate:"required"`
-	Code       int    `form:"code" validate:"required"`
-	Name       string `form:"name" validate:"required"`
+type Job struct{}
+type jobRequest struct {
+	Name string `form:"name" validate:"required"`
 }
 
-var cityRepository repositories.City
+var jobRepository repositories.Job
 
-func (City) Index(c *gin.Context) {
+func (Job) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		postNewCity(c)
+		postNewJob(c)
 		return
 	}
 	q := c.Query("q")
-	data, err := cityRepository.All(q)
+	data, err := jobRepository.All(q)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
@@ -44,9 +41,9 @@ func (City) Index(c *gin.Context) {
 	})
 }
 
-func (City) FindByID(c *gin.Context) {
+func (Job) FindByID(c *gin.Context) {
 	id := c.Param("id")
-	data, err := cityRepository.FindByID(id)
+	data, err := jobRepository.FindByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.AbortWithStatusJSON(http.StatusNotFound, lib.Response{
@@ -63,13 +60,14 @@ func (City) FindByID(c *gin.Context) {
 		})
 		return
 	}
+
 	if c.Request.Method == "PATCH" {
-		patchCity(c, data)
+		patchJob(c, data)
 		return
 	}
 
 	if c.Request.Method == "DELETE" {
-		deleteCity(c, data)
+		deleteJob(c, data)
 		return
 	}
 	c.JSON(http.StatusOK, lib.Response{
@@ -78,10 +76,10 @@ func (City) FindByID(c *gin.Context) {
 		Data:    data,
 	})
 }
-func postNewCity(c *gin.Context) {
-	var r cityRequest
-	c.Bind(&r)
 
+func postNewJob(c *gin.Context) {
+	var r jobRequest
+	c.Bind(&r)
 	v := validator.New()
 	if e := v.Struct(&r); e != nil {
 		messages := lib.ErrorMessageValidation(e)
@@ -93,20 +91,10 @@ func postNewCity(c *gin.Context) {
 		return
 	}
 
-	provinceId, e := uuid.Parse(r.ProvinceID)
-	if e != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid province id format",
-		})
-		return
+	model := model.Job{
+		Name: r.Name,
 	}
-	model := model.City{
-		ProvinceID: provinceId,
-		Code:       r.Code,
-		Name:       r.Name,
-	}
-	data, err := cityRepository.Create(&model)
+	data, err := jobRepository.Create(&model)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
@@ -122,8 +110,8 @@ func postNewCity(c *gin.Context) {
 	})
 }
 
-func patchCity(c *gin.Context, d *model.City) {
-	var r cityRequest
+func patchJob(c *gin.Context, d *model.Job) {
+	var r jobRequest
 	c.Bind(&r)
 	v := validator.New()
 	if e := v.Struct(&r); e != nil {
@@ -135,20 +123,10 @@ func patchCity(c *gin.Context, d *model.City) {
 		})
 		return
 	}
-	provinceId, e := uuid.Parse(r.ProvinceID)
-	if e != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid province id format",
-		})
-		return
-	}
 	data := map[string]interface{}{
-		"province_id": provinceId,
-		"code":        r.Code,
-		"name":        r.Name,
+		"name": r.Name,
 	}
-	result, err := cityRepository.Patch(d, data)
+	result, err := jobRepository.Patch(d, data)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
@@ -164,8 +142,8 @@ func patchCity(c *gin.Context, d *model.City) {
 	})
 }
 
-func deleteCity(c *gin.Context, d *model.City) {
-	err := cityRepository.Delete(d)
+func deleteJob(c *gin.Context, d *model.Job) {
+	err := jobRepository.Delete(d)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
