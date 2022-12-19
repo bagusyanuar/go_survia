@@ -68,18 +68,19 @@ type Sec struct {
 
 type SecQuestion struct {
 	ID        uuid.UUID      `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;primaryKey;" json:"id"`
-	SecID     uuid.UUID      `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;primaryKey;" json:"sec_id"`
 	Question  string         `gorm:"type:text;not null;" json:"question"`
+	IndexOf   uint           `gorm:"type:int(11) UNSIGNED;not null;default:0" json:"index_of"`
 	CreatedAt time.Time      `gorm:"column:created_at;not null" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"column:updated_at;not null" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;" json:"deleted_at"`
-	Sec       Sec            `gorm:"foreignKey:SecID"`
 }
 
 type SecAnswer struct {
 	ID            uuid.UUID      `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;primaryKey;" json:"id"`
-	SecQuestionID uuid.UUID      `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;primaryKey;" json:"sec_question_id"`
-	Question      string         `gorm:"type:text;not null;" json:"question"`
+	SecQuestionID uuid.UUID      `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;" json:"sec_question_id"`
+	Answer        string         `gorm:"type:text;not null;" json:"question"`
+	Score         int            `gorm:"type:int(11);not null;" json:"score"`
+	IndexOf       uint           `gorm:"type:int(11) UNSIGNED;not null;default:0" json:"index_of"`
 	CreatedAt     time.Time      `gorm:"column:created_at;not null" json:"created_at"`
 	UpdatedAt     time.Time      `gorm:"column:updated_at;not null" json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"column:deleted_at;" json:"deleted_at"`
@@ -156,18 +157,18 @@ type Member struct {
 }
 
 type Campaign struct {
-	ID               uuid.UUID      `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;primaryKey;" json:"id"`
-	Title            string         `gorm:"type:varchar(255);not null" json:"title"`
-	Description      string         `gorm:"type:text;not null" json:"description"`
-	ShortDescription string         `gorm:"type:text;not null" json:"short_description"`
+	ID               uuid.UUID       `gorm:"type:char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;primaryKey;" json:"id"`
+	Title            string          `gorm:"type:varchar(255);not null" json:"title"`
+	Description      string          `gorm:"type:text;not null" json:"description"`
+	ShortDescription string          `gorm:"type:text;not null" json:"short_description"`
 	Image            *string         `gorm:"type:text;" json:"image"`
 	StartAt          *datatypes.Date `gorm:"column:start_at;type:date;" json:"start_at"`
 	FinishAt         *datatypes.Date `gorm:"column:finish_at;type:date;" json:"finish_at"`
-	Status           uint           `gorm:"column:status;type:smallint(6);not null;" json:"status"`
-	Background       string         `gorm:"type:varchar(255);not null" json:"background"`
-	CreatedAt        time.Time      `gorm:"column:created_at;not null" json:"created_at"`
-	UpdatedAt        time.Time      `gorm:"column:updated_at;not null" json:"updated_at"`
-	DeletedAt        gorm.DeletedAt `gorm:"column:deleted_at;" json:"deleted_at"`
+	Status           uint            `gorm:"column:status;type:smallint(6);not null;" json:"status"`
+	Background       string          `gorm:"type:varchar(255);not null" json:"background"`
+	CreatedAt        time.Time       `gorm:"column:created_at;not null" json:"created_at"`
+	UpdatedAt        time.Time       `gorm:"column:updated_at;not null" json:"updated_at"`
+	DeletedAt        gorm.DeletedAt  `gorm:"column:deleted_at;" json:"deleted_at"`
 }
 
 func Migrate() {
