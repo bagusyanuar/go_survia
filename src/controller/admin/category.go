@@ -3,8 +3,8 @@ package admin
 import (
 	"errors"
 	"go-survia/src/lib"
-	"go-survia/src/model"
 	"go-survia/src/repositories"
+	request "go-survia/src/request/admin"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,13 +16,9 @@ type Category struct{}
 
 var categoryRepository repositories.Category
 
-type categoryRequest struct {
-	Name string `form:"name" validate:"required" json:"name"`
-}
-
-func (Category) Index(c *gin.Context) {
+func (category Category) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		postNewCategory(c)
+		category.post(c)
 		return
 	}
 	q := c.Query("q")
@@ -64,37 +60,37 @@ func (Category) FindByID(c *gin.Context) {
 
 	//update method
 	if c.Request.Method == "PATCH" {
-		var r categoryRequest
-		c.Bind(&r)
-		v := validator.New()
-		if e := v.Struct(&r); e != nil {
-			messages := lib.ErrorMessageValidation(e)
-			c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-				Code:    http.StatusBadRequest,
-				Message: "invalid data request",
-				Data:    messages,
-			})
-			return
-		}
-		patchData := map[string]interface{}{
-			"name": r.Name,
-		}
+		// var r categoryRequest
+		// c.Bind(&r)
+		// v := validator.New()
+		// if e := v.Struct(&r); e != nil {
+		// 	messages := lib.ErrorMessageValidation(e)
+		// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+		// 		Code:    http.StatusBadRequest,
+		// 		Message: "invalid data request",
+		// 		Data:    messages,
+		// 	})
+		// 	return
+		// }
+		// patchData := map[string]interface{}{
+		// 	"name": r.Name,
+		// }
 
-		patchResult, err := categoryRepository.Patch(data, patchData)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-				Code:    http.StatusInternalServerError,
-				Data:    nil,
-				Message: err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusOK, lib.Response{
-			Code:    http.StatusOK,
-			Message: "success",
-			Data:    patchResult,
-		})
-		return
+		// patchResult, err := categoryRepository.Patch(data, patchData)
+		// if err != nil {
+		// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+		// 		Code:    http.StatusInternalServerError,
+		// 		Data:    nil,
+		// 		Message: err.Error(),
+		// 	})
+		// 	return
+		// }
+		// c.JSON(http.StatusOK, lib.Response{
+		// 	Code:    http.StatusOK,
+		// 	Message: "success",
+		// 	Data:    patchResult,
+		// })
+		// return
 	}
 
 	if c.Request.Method == "DELETE" {
@@ -120,8 +116,8 @@ func (Category) FindByID(c *gin.Context) {
 	})
 }
 
-func postNewCategory(c *gin.Context) {
-	var r categoryRequest
+func (Category) post(c *gin.Context) {
+	var r request.AdminCategoryRequest
 	c.Bind(&r)
 	v := validator.New()
 	if e := v.Struct(&r); e != nil {
@@ -133,10 +129,7 @@ func postNewCategory(c *gin.Context) {
 		})
 		return
 	}
-	model := model.Category{
-		Name: r.Name,
-	}
-	data, err := categoryRepository.Create(&model)
+	_, err := categoryRepository.Create(&r)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
@@ -148,6 +141,5 @@ func postNewCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
 		Message: "success",
-		Data:    data,
 	})
 }

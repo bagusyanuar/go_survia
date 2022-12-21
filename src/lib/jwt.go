@@ -2,7 +2,7 @@ package lib
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 var JWTSigninMethod = jwt.SigningMethodHS256

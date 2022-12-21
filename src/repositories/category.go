@@ -3,8 +3,9 @@ package repositories
 import (
 	"go-survia/database"
 	"go-survia/src/model"
+	request "go-survia/src/request/admin"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 type Category struct{}
@@ -33,11 +34,14 @@ func (Category) FindByID(id string) (r *model.Category, err error) {
 	return category, nil
 }
 
-func (Category) Create(m *model.Category) (r *model.Category, err error) {
+func (Category) Create(request *request.AdminCategoryRequest) (r *model.Category, err error) {
+	m := model.Category{
+		Name: request.Name,
+	}
 	if err := database.DB.Create(&m).Error; err != nil {
 		return nil, err
 	}
-	return m, nil
+	return &m, nil
 }
 
 func (Category) Patch(m *model.Category, d interface{}) (r *model.Category, err error) {

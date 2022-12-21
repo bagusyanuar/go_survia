@@ -3,6 +3,7 @@ package repositories
 import (
 	"go-survia/database"
 	"go-survia/src/model"
+	adminResponse "go-survia/src/response/admin"
 
 	"gorm.io/gorm"
 )
@@ -14,27 +15,27 @@ type apiSecQuestionResponse struct {
 	Answers []model.SecAnswer `gorm:"foreignKey:SecQuestionID" json:"answers"`
 }
 
-func (SecQuestion) All(q string) (b []apiSecQuestionResponse, err error) {
-	var secQuestions []apiSecQuestionResponse
-	if err = database.DB.Unscoped().
+func (SecQuestion) All(q string) (b []adminResponse.APISecQuestionResponse, err error) {
+	var response []adminResponse.APISecQuestionResponse
+	if err = database.DB.Unscoped().Debug().
 		Model(&model.SecQuestion{}).
 		Preload("Answers", func(db *gorm.DB) *gorm.DB {
 			return db.Order("index_of DESC")
 		}).
 		Where("question LIKE ?", "%"+q+"%").
 		Order("created_at ASC").
-		Find(&secQuestions).Error; err != nil {
-		return secQuestions, err
+		Find(&response).Error; err != nil {
+		return response, err
 	}
-	return secQuestions, nil
+	return response, nil
 }
 
-func (SecQuestion) FindByID(id string) (r *apiSecQuestionResponse, err error) {
-	var secQuestion *apiSecQuestionResponse
-	if err = database.DB.Model(&model.SecQuestion{}).Preload("Answers").First(&secQuestion, "id = ?", id).Error; err != nil {
-		return secQuestion, err
+func (SecQuestion) FindByID(id string) (r *adminResponse.APISecQuestionResponse, err error) {
+	var response *adminResponse.APISecQuestionResponse
+	if err = database.DB.Model(&model.SecQuestion{}).Preload("Answers").First(&response, "id = ?", id).Error; err != nil {
+		return response, err
 	}
-	return secQuestion, nil
+	return response, nil
 }
 
 func (SecQuestion) Create(m *model.SecQuestion) (r *model.SecQuestion, err error) {
@@ -44,12 +45,11 @@ func (SecQuestion) Create(m *model.SecQuestion) (r *model.SecQuestion, err error
 	return m, nil
 }
 
-func (SecQuestion) Patch(id string, d map[string]interface{}) (err error) {
+func (SecQuestion) Patch(id string, d *apiSecQuestionResponse) (err error) {
 
 	var sq *model.SecQuestion
-	q := d["question"]
 	qUpdate := map[string]interface{}{
-		"question": q,
+		"question": d.Question,
 	}
 
 	tx := database.DB.Begin()
@@ -62,10 +62,6 @@ func (SecQuestion) Patch(id string, d map[string]interface{}) (err error) {
 		tx.Rollback()
 		return err
 	}
-
-	// for _, v := range d["anwers"] {
-
-	// }
 	tx.Commit()
 	return nil
 }

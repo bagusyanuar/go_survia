@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -20,8 +21,9 @@ type secQuestionRequest struct {
 }
 
 type secQuestionAnswerRequest struct {
-	Answer string `json:"answer" validate:"required"`
-	Score  uint   `json:"score" validate:"required"`
+	ID     *uuid.UUID `json:"id"`
+	Answer string     `json:"answer" validate:"required"`
+	Score  uint       `json:"score" validate:"required"`
 }
 
 var secQuestionRepository repositories.SecQuestion
@@ -127,24 +129,37 @@ func postNewSecQuestion(c *gin.Context) {
 	}
 	lastSecQuestionIndex = int(lastSecQuestion.IndexOf) + 1
 
-	sqModel := model.SecQuestion{
-		Question: r.Question,
-		IndexOf:  uint(lastSecQuestionIndex),
+	type SecQuestion struct {
+		model.SecQuestion
+		Answers  []model.SecAnswer
 	}
-	if err := tx.Create(&sqModel).Error; err != nil {
-		tx.Rollback()
+	sqModel := SecQuestion{
+		SecQuestion: model.SecQuestion{
+			Question: r.Question,
+			IndexOf: uint(lastSecQuestionIndex),
+		},
 	}
-
+	var arrSaModel []model.SecAnswer
 	for k, v := range r.Answers {
 		saModel := model.SecAnswer{
-			SecQuestionID: sqModel.ID,
-			Answer:        v.Answer,
-			Score:         int(v.Score),
-			IndexOf:       uint((k + 1)),
+			Answer:  v.Answer,
+			Score:   int(v.Score),
+			IndexOf: uint((k + 1)),
 		}
-		if err := tx.Create(&saModel).Error; err != nil {
-			tx.Rollback()
-		}
+		arrSaModel = append(arrSaModel, saModel)
+		// if err := tx.Create(&saModel).Error; err != nil {
+		// 	tx.Rollback()
+		// }
+	}
+	sqModel.Answers = arrSaModel
+	if err := tx.Debug().Create(&sqModel).Error; err != nil {
+		tx.Rollback()
+		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+			Code:    http.StatusInternalServerError,
+			Data:    nil,
+			Message: err.Error(),
+		})
+		return
 	}
 	tx.Commit()
 	c.JSON(http.StatusOK, lib.Response{
@@ -166,20 +181,16 @@ func patchSecQuestion(c *gin.Context, id string) {
 		})
 		return
 	}
-	data := map[string]interface{}{
-		"question": r.Question,
-		"answers":  r.Answers,
-	}
 
-	err := secQuestionRepository.Patch(id, data)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
+	// err := secQuestionRepository.Patch(id, data)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
 		Message: "success",
