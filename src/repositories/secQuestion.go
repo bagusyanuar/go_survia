@@ -29,9 +29,9 @@ func (SecQuestion) All(q string) (b []apiSecQuestionResponse, err error) {
 	return secQuestions, nil
 }
 
-func (SecQuestion) FindByID(id string) (r *model.SecQuestion, err error) {
-	var secQuestion *model.SecQuestion
-	if err = database.DB.Model(&model.SecQuestion{}).First(&secQuestion, "id = ?", id).Error; err != nil {
+func (SecQuestion) FindByID(id string) (r *apiSecQuestionResponse, err error) {
+	var secQuestion *apiSecQuestionResponse
+	if err = database.DB.Model(&model.SecQuestion{}).Preload("Answers").First(&secQuestion, "id = ?", id).Error; err != nil {
 		return secQuestion, err
 	}
 	return secQuestion, nil
@@ -44,11 +44,30 @@ func (SecQuestion) Create(m *model.SecQuestion) (r *model.SecQuestion, err error
 	return m, nil
 }
 
-func (SecQuestion) Patch(m *model.SecQuestion, d interface{}) (r *model.SecQuestion, err error) {
-	if err = database.DB.Model(&m).Updates(d).Error; err != nil {
-		return m, err
+func (SecQuestion) Patch(id string, d map[string]interface{}) (err error) {
+
+	var sq *model.SecQuestion
+	q := d["question"]
+	qUpdate := map[string]interface{}{
+		"question": q,
 	}
-	return m, nil
+
+	tx := database.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err = database.DB.Model(&sq).Where("id = ?", id).Updates(qUpdate).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// for _, v := range d["anwers"] {
+
+	// }
+	tx.Commit()
+	return nil
 }
 
 func (SecQuestion) Delete(m *model.SecQuestion) (err error) {

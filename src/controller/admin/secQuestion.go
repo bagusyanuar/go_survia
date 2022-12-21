@@ -68,15 +68,15 @@ func (SecQuestion) FindByID(c *gin.Context) {
 		return
 	}
 
-	if c.Request.Method == "PATCH" {
-		patchSecQuestion(c, data)
-		return
-	}
+	// if c.Request.Method == "PATCH" {
+	// 	patchSecQuestion(c, data)
+	// 	return
+	// }
 
-	if c.Request.Method == "DELETE" {
-		deleteQuestion(c, data)
-		return
-	}
+	// if c.Request.Method == "DELETE" {
+	// 	deleteQuestion(c, data)
+	// 	return
+	// }
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
 		Message: "success",
@@ -153,7 +153,7 @@ func postNewSecQuestion(c *gin.Context) {
 	})
 }
 
-func patchSecQuestion(c *gin.Context, d *model.SecQuestion) {
+func patchSecQuestion(c *gin.Context, id string) {
 	var r secQuestionRequest
 	c.Bind(&r)
 	v := validator.New()
@@ -168,8 +168,10 @@ func patchSecQuestion(c *gin.Context, d *model.SecQuestion) {
 	}
 	data := map[string]interface{}{
 		"question": r.Question,
+		"answers":  r.Answers,
 	}
-	result, err := secQuestionRepository.Patch(d, data)
+
+	err := secQuestionRepository.Patch(id, data)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
 			Code:    http.StatusInternalServerError,
@@ -181,7 +183,7 @@ func patchSecQuestion(c *gin.Context, d *model.SecQuestion) {
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
 		Message: "success",
-		Data:    result,
+		Data:    nil,
 	})
 }
 
