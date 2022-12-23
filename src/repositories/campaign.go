@@ -3,20 +3,21 @@ package repositories
 import (
 	"go-survia/database"
 	"go-survia/src/model"
+	adminResponse "go-survia/src/response/admin"
 )
 
 type Campaign struct{}
 
-func (Campaign) All(q string) (b []model.Campaign, err error) {
-	var campaigns []model.Campaign
+func (Campaign) All(q string) (b []adminResponse.APICampaign, err error) {
+	var campaigns []adminResponse.APICampaign
 	if err = database.DB.Unscoped().Model(&model.Campaign{}).Where("title LIKE ?", "%"+q+"%").Or("description LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&campaigns).Error; err != nil {
 		return campaigns, err
 	}
 	return campaigns, nil
 }
 
-func (Campaign) FindByID(id string) (r *model.Campaign, err error) {
-	var campaign *model.Campaign
+func (Campaign) FindByID(id string) (r *adminResponse.APICampaign, err error) {
+	var campaign *adminResponse.APICampaign
 	if err = database.DB.Model(&model.Campaign{}).First(&campaign, "id = ?", id).Error; err != nil {
 		return campaign, err
 	}

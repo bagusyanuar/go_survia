@@ -87,7 +87,7 @@ func (Category) patch(c *gin.Context, id string) {
 	data := map[string]interface{}{
 		"name": r.Name,
 	}
-	result, err := categoryRepository.Patch(id, data)
+	err := categoryRepository.Patch(id, data)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			lib.JSONNotFoundResponse(c, err.Error(), nil)
@@ -96,11 +96,7 @@ func (Category) patch(c *gin.Context, id string) {
 		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
 	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    result,
-	})
+	lib.JSONSuccessResponse(c, nil)
 }
 
 func (Category) delete(c *gin.Context, id string) {
@@ -113,9 +109,5 @@ func (Category) delete(c *gin.Context, id string) {
 		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
 	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    nil,
-	})
+	lib.JSONSuccessResponse(c, nil)
 }

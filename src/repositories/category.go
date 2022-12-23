@@ -45,25 +45,21 @@ func (Category) Create(request *request.AdminCategoryRequest) (r *model.Category
 	return &m, nil
 }
 
-func (Category) Patch(id string, d interface{}) (r *model.Category, err error) {
+func (Category) Patch(id string, d interface{}) (err error) {
 
 	var category *model.Category
-	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
-		return nil, err
+	if err = database.DB.Debug().Model(&category).Where("id = ?", id).Updates(d).Error; err != nil {
+		return err
 	}
-
-	if err = database.DB.Model(&category).Updates(d).Error; err != nil {
-		return category, err
-	}
-	return category, nil
+	return nil
 }
 
 func (Category) Delete(id string) (err error) {
 	var category *model.Category
-	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
-		return err
-	}
-	if err = database.DB.Delete(&category).Error; err != nil {
+	// if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
+	// 	return err
+	// }
+	if err = database.DB.Where("id = ?", id).Delete(&category).Error; err != nil {
 		return err
 	}
 	return nil
