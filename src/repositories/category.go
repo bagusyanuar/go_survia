@@ -4,6 +4,7 @@ import (
 	"go-survia/database"
 	"go-survia/src/model"
 	request "go-survia/src/request/admin"
+	adminResponse "go-survia/src/response/admin"
 
 	"github.com/google/uuid"
 )
@@ -18,16 +19,16 @@ type CategoryResponse struct {
 var apiCategories []CategoryResponse
 
 //admin
-func (Category) All(q string) (b []model.Category, err error) {
-	var categories []model.Category
+func (Category) All(q string) (b []adminResponse.APICategoryResponse, err error) {
+	var categories []adminResponse.APICategoryResponse
 	if err = database.DB.Unscoped().Model(&model.Category{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&categories).Error; err != nil {
 		return categories, err
 	}
 	return categories, nil
 }
 
-func (Category) FindByID(id string) (r *model.Category, err error) {
-	var category *model.Category
+func (Category) FindByID(id string) (r *adminResponse.APICategoryResponse, err error) {
+	var category *adminResponse.APICategoryResponse
 	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
 		return category, err
 	}
@@ -44,15 +45,25 @@ func (Category) Create(request *request.AdminCategoryRequest) (r *model.Category
 	return &m, nil
 }
 
-func (Category) Patch(m *model.Category, d interface{}) (r *model.Category, err error) {
-	if err = database.DB.Model(&m).Updates(d).Error; err != nil {
-		return m, err
+func (Category) Patch(id string, d interface{}) (r *model.Category, err error) {
+
+	var category *model.Category
+	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
+		return nil, err
 	}
-	return m, nil
+
+	if err = database.DB.Model(&category).Updates(d).Error; err != nil {
+		return category, err
+	}
+	return category, nil
 }
 
-func (Category) Delete(m *model.Category) (err error) {
-	if err = database.DB.Delete(&m).Error; err != nil {
+func (Category) Delete(id string) (err error) {
+	var category *model.Category
+	if err = database.DB.Model(&model.Category{}).First(&category, "id = ?", id).Error; err != nil {
+		return err
+	}
+	if err = database.DB.Delete(&category).Error; err != nil {
 		return err
 	}
 	return nil

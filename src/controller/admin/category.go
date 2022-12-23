@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -24,89 +23,34 @@ func (category Category) Index(c *gin.Context) {
 	q := c.Query("q")
 	data, err := categoryRepository.All(q)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
+		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
 	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    data,
-	})
+	lib.JSONSuccessResponse(c, data)
 }
 
-func (Category) FindByID(c *gin.Context) {
+func (category Category) FindByID(c *gin.Context) {
 	id := c.Param("id")
-	data, err := categoryRepository.FindByID(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, lib.Response{
-				Code:    http.StatusNotFound,
-				Data:    nil,
-				Message: err.Error(),
-			})
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
 
 	//update method
 	if c.Request.Method == "PATCH" {
-		// var r categoryRequest
-		// c.Bind(&r)
-		// v := validator.New()
-		// if e := v.Struct(&r); e != nil {
-		// 	messages := lib.ErrorMessageValidation(e)
-		// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-		// 		Code:    http.StatusBadRequest,
-		// 		Message: "invalid data request",
-		// 		Data:    messages,
-		// 	})
-		// 	return
-		// }
-		// patchData := map[string]interface{}{
-		// 	"name": r.Name,
-		// }
-
-		// patchResult, err := categoryRepository.Patch(data, patchData)
-		// if err != nil {
-		// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-		// 		Code:    http.StatusInternalServerError,
-		// 		Data:    nil,
-		// 		Message: err.Error(),
-		// 	})
-		// 	return
-		// }
-		// c.JSON(http.StatusOK, lib.Response{
-		// 	Code:    http.StatusOK,
-		// 	Message: "success",
-		// 	Data:    patchResult,
-		// })
-		// return
+		category.patch(c, id)
+		return
 	}
 
+	//delete method
 	if c.Request.Method == "DELETE" {
-		err := categoryRepository.Delete(data)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-				Code:    http.StatusInternalServerError,
-				Data:    nil,
-				Message: err.Error(),
-			})
+		category.delete(c, id)
+		return
+	}
+
+	data, err := categoryRepository.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			lib.JSONNotFoundResponse(c, err.Error(), nil)
 			return
 		}
-		c.JSON(http.StatusOK, lib.Response{
-			Code:    http.StatusOK,
-			Message: "success",
-		})
+		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
 	}
 	c.JSON(http.StatusOK, lib.Response{
@@ -119,27 +63,59 @@ func (Category) FindByID(c *gin.Context) {
 func (Category) post(c *gin.Context) {
 	var r request.AdminCategoryRequest
 	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
+	m, e := lib.ValidateRequest(&r)
+	if e != nil {
+		lib.JSONBadRequestResponse(c, "invalid data request", m)
 		return
 	}
 	_, err := categoryRepository.Create(&r)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
+		lib.JSONErrorResponse(c, "internal server error", nil)
+		return
+	}
+	lib.JSONSuccessResponse(c, nil)
+}
+
+func (Category) patch(c *gin.Context, id string) {
+	var r request.AdminCategoryRequest
+	c.Bind(&r)
+	m, e := lib.ValidateRequest(&r)
+	if e != nil {
+		lib.JSONBadRequestResponse(c, "invalid data request", m)
+		return
+	}
+	data := map[string]interface{}{
+		"name": r.Name,
+	}
+	result, err := categoryRepository.Patch(id, data)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			lib.JSONNotFoundResponse(c, err.Error(), nil)
+			return
+		}
+		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
 	}
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
 		Message: "success",
+		Data:    result,
+	})
+}
+
+func (Category) delete(c *gin.Context, id string) {
+	err := categoryRepository.Delete(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			lib.JSONNotFoundResponse(c, err.Error(), nil)
+			return
+		}
+		lib.JSONErrorResponse(c, err.Error(), nil)
+		return
+	}
+	c.JSON(http.StatusOK, lib.Response{
+		Code:    http.StatusOK,
+		Message: "success",
+		Data:    nil,
 	})
 }

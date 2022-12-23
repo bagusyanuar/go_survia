@@ -57,3 +57,11 @@ func ErrorMessageValidation(err error) []map[string]interface{} {
 	}
 	return results
 }
+
+func ValidateRequest(r interface{}) (m []map[string]interface{}, err error) {
+	v := validator.New()
+	if e := v.Struct(r); e != nil {
+		return ErrorMessageValidation(e), e
+	}
+	return []map[string]interface{}{}, nil
+}
