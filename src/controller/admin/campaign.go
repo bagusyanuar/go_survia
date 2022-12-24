@@ -7,8 +7,12 @@ import (
 	"go-survia/src/repositories"
 	request "go-survia/src/request/admin"
 	"net/http"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -203,7 +207,7 @@ func (campaign *Campaign) FindByID(c *gin.Context) {
 	})
 }
 
-func (Campaign) post(c *gin.Context)  {
+func (campaign Campaign) post(c *gin.Context) {
 	var r request.AdminCampaignRequest
 	c.Bind(&r)
 	m, e := lib.ValidateRequest(&r)
@@ -212,102 +216,61 @@ func (Campaign) post(c *gin.Context)  {
 		return
 	}
 
+	model, e := campaign.postData(c, &r)
+	if e != nil {
+		lib.JSONErrorResponse(c, e.Error(), nil)
+		return
+	}
+
+	res, e := campaignRepository.Create(model)
+	if e != nil {
+		lib.JSONErrorResponse(c, e.Error(), nil)
+		return
+	}
+	lib.JSONSuccessResponse(c, res)
 
 }
 
-func (Campaign) postData(r *request.AdminCampaignRequest) (m *model.Campaign, err error)  {
-	// var startAt *datatypes.Date
-	// var finishAt *datatypes.Date
-	// var image *string
+func (Campaign) postData(c *gin.Context, r *request.AdminCampaignRequest) (m *model.Campaign, err error) {
+	var startAt *datatypes.Date
+	var finishAt *datatypes.Date
+	var image *string
 
-	// if r.StartAt != "" {
-		
-	// }
+	if r.StartAt != "" {
+		tmp, e := time.Parse("2006-01-02", r.StartAt)
+		if e != nil {
+			return nil, e
+		}
+		startAt = (*datatypes.Date)(&tmp)
+	}
 
+	if r.FinishAt != "" {
+		tmp, e := time.Parse("2006-01-02", r.FinishAt)
+		if e != nil {
+			return nil, e
+		}
+		finishAt = (*datatypes.Date)(&tmp)
+	}
 
-	return nil, nil
-}
-func postNewCampaign(c *gin.Context) {
-	// var r campaignRequest
-	// c.Bind(&r)
-	// v := validator.New()
-	// if e := v.Struct(&r); e != nil {
-	// 	messages := lib.ErrorMessageValidation(e)
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-	// 		Code:    http.StatusBadRequest,
-	// 		Message: "invalid data request",
-	// 		Data:    messages,
-	// 	})
-	// 	return
-	// }
+	file, _ := c.FormFile("image")
 
-	// var startAt *datatypes.Date
-	// var finishAt *datatypes.Date
-	// var image *string
+	if file != nil {
+		ext := filepath.Ext(file.Filename)
+		fileName := "assets/campaigns/" + uuid.New().String() + ext
+		image = &fileName
+		if errorUpload := c.SaveUploadedFile(file, fileName); errorUpload != nil {
+			return nil, errorUpload
+		}
+	}
 
-	// if r.StartAt != "" {
-	// 	tmp, e := time.Parse("2006-01-02", r.StartAt)
-	// 	if e != nil {
-	// 		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-	// 			Code:    http.StatusBadRequest,
-	// 			Message: "start_at value must be date format",
-	// 			Data:    nil,
-	// 		})
-	// 		return
-	// 	}
-	// 	startAt = (*datatypes.Date)(&tmp)
-	// }
-
-	// if r.FinishAt != "" {
-	// 	tmp, e := time.Parse("2006-01-02", r.FinishAt)
-	// 	if e != nil {
-	// 		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-	// 			Code:    http.StatusBadRequest,
-	// 			Message: "finish_at value must be date format",
-	// 			Data:    nil,
-	// 		})
-	// 		return
-	// 	}
-	// 	finishAt = (*datatypes.Date)(&tmp)
-	// }
-
-	// file, _ := c.FormFile("image")
-
-	// if file != nil {
-	// 	ext := filepath.Ext(file.Filename)
-	// 	fileName := "assets/campaigns/" + uuid.New().String() + ext
-	// 	image = &fileName
-	// 	if errorUpload := c.SaveUploadedFile(file, fileName); errorUpload != nil {
-	// 		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-	// 			Code:    http.StatusInternalServerError,
-	// 			Data:    nil,
-	// 			Message: errorUpload.Error(),
-	// 		})
-	// 		return
-	// 	}
-	// }
-
-	// model := model.Campaign{
-	// 	Title:            r.Title,
-	// 	Description:      r.Description,
-	// 	ShortDescription: r.ShortDescription,
-	// 	StartAt:          startAt,
-	// 	FinishAt:         finishAt,
-	// 	Background:       r.Background,
-	// 	Image:            image,
-	// }
-	// data, err := campaignRepository.Create(&model)
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-	// 		Code:    http.StatusInternalServerError,
-	// 		Data:    nil,
-	// 		Message: err.Error(),
-	// 	})
-	// 	return
-	// }
-	// c.JSON(http.StatusOK, lib.Response{
-	// 	Code:    http.StatusOK,
-	// 	Message: "success",
-	// 	Data:    data,
-	// })
+	model := model.Campaign{
+		Title:            r.Title,
+		Description:      r.Description,
+		ShortDescription: r.ShortDescription,
+		StartAt:          startAt,
+		FinishAt:         finishAt,
+		Background:       r.Background,
+		Image:            image,
+	}
+	return &model, nil
 }
