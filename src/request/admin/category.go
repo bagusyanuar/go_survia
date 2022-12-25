@@ -1,5 +1,5 @@
 package admin
 
-type AdminCategoryRequest struct {
+type AdminCategory struct {
 	Name string `form:"name" validate:"required" json:"name"`
 }

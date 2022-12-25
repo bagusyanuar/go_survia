@@ -16,6 +16,7 @@ var (
 	ErrNoAuthorization = errors.New("unauthorized")
 	ErrInvalidPassword = errors.New("password did not match")
 	ErrInvalidRole     = errors.New("role did not match")
+	ErrBadRequest      = errors.New("bad request")
 )
 
 func ErrorSignIn(err error) Response {

@@ -4,18 +4,16 @@ import (
 	"go-survia/database"
 	"go-survia/src/model"
 	adminResponse "go-survia/src/response/admin"
-
-	"github.com/google/uuid"
 )
 
 type Category struct{}
 
-type CategoryResponse struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-}
+// type CategoryResponse struct {
+// 	ID   uuid.UUID `json:"id"`
+// 	Name string    `json:"name"`
+// }
 
-var apiCategories []CategoryResponse
+// var apiCategories []CategoryResponse
 
 //admin
 func (Category) All(q string) (b []adminResponse.APICategory, err error) {
@@ -34,34 +32,30 @@ func (Category) FindByID(id string) (r *adminResponse.APICategory, err error) {
 	return category, nil
 }
 
-func (Category) Create(entity *model.Category) (r *model.Category, err error) {
-
+func (Category) Create(entity *model.Category) error {
 	if err := database.DB.Create(&entity).Error; err != nil {
-		return nil, err
-	}
-	return entity, nil
-}
-
-func (Category) Patch(id string, d interface{}) (err error) {
-
-	var category *model.Category
-	if err = database.DB.Debug().Model(&category).Where("id = ?", id).Updates(d).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (Category) Delete(id string) (err error) {
-	var category *model.Category
-	if err = database.DB.Where("id = ?", id).Delete(&category).Error; err != nil {
+func (Category) Patch(id string, d interface{}) error {
+	if err := database.DB.Debug().Model(&model.Category{}).Where("id = ?", id).Updates(d).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (Category) GetCategories(q string) (r []CategoryResponse, err error) {
-	if err = database.DB.Model(&model.Category{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&apiCategories).Error; err != nil {
-		return apiCategories, err
+func (Category) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.Category{}).Error; err != nil {
+		return err
 	}
-	return apiCategories, nil
+	return nil
 }
+
+// func (Category) GetCategories(q string) (r []CategoryResponse, err error) {
+// 	if err = database.DB.Model(&model.Category{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&apiCategories).Error; err != nil {
+// 		return apiCategories, err
+// 	}
+// 	return apiCategories, nil
+// }

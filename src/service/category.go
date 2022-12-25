@@ -12,21 +12,44 @@ type Category struct {
 	repository repositories.Category
 }
 
-func (category *Category) Create(request *adminRequest.AdminCategoryRequest) (data interface{}, err error) {
-
-	d, e := lib.ValidateRequest(request)
+func (category *Category) Create(request *adminRequest.AdminCategory) (d interface{}, err error) {
+	messages, e := lib.ValidateRequest(request)
 	if e != nil {
-		return d, e
+		return messages, lib.ErrBadRequest
 	}
 	entity := model.Category{
 		Name: request.Name,
 	}
-	m, e := category.repository.Create(&entity)
+	e = category.repository.Create(&entity)
 	if e != nil {
 		return nil, e
 	}
-	return m, nil
+	return nil, nil
 }
-func (c *Category) FindAll(q string) (b []adminResponse.APICategory, err error) {
-	return c.repository.All(q)
+
+func (category *Category) Patch(id string, request *adminRequest.AdminCategory) (d interface{}, err error) {
+	messages, e := lib.ValidateRequest(request)
+	if e != nil {
+		return messages, lib.ErrBadRequest
+	}
+	data := map[string]interface{}{
+		"name": request.Name,
+	}
+	return nil, category.repository.Patch(id, data)
+}
+
+func (category *Category) Delete(id string) error {
+	return category.repository.Delete(id)
+}
+
+func (category *Category) FindAll(q string) (b []adminResponse.APICategory, err error) {
+	return category.repository.All(q)
+}
+
+func (category *Category) FindByID(id string) (r *adminResponse.APICategory, err error) {
+	entity, e := category.repository.FindByID(id)
+	if e != nil {
+		return nil, e
+	}
+	return entity, nil
 }

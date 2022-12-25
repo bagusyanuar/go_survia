@@ -3,36 +3,32 @@ package repositories
 import (
 	"go-survia/database"
 	"go-survia/src/model"
-	request "go-survia/src/request/admin"
 	adminResponse "go-survia/src/response/admin"
 )
 
 type Bank struct{}
 
-func (Bank) All(q string) (b []adminResponse.APIBankResponse, err error) {
-	var banks []adminResponse.APIBankResponse
+//admin
+func (Bank) All(q string) (b []adminResponse.APIBank, err error) {
+	var banks []adminResponse.APIBank
 	if err = database.DB.Unscoped().Model(&model.Bank{}).Where("name LIKE ?", "%"+q+"%").Find(&banks).Error; err != nil {
 		return banks, err
 	}
 	return banks, nil
 }
 
-func (Bank) FindByID(id string) (r *adminResponse.APIBankResponse, err error) {
-	var bank *adminResponse.APIBankResponse
+func (Bank) FindByID(id string) (r *adminResponse.APIBank, err error) {
+	var bank *adminResponse.APIBank
 	if err = database.DB.Model(&model.Bank{}).First(&bank, "id = ?", id).Error; err != nil {
 		return bank, err
 	}
 	return bank, nil
 }
-func (Bank) Create(request *request.AdminBankRequest) (r *model.Bank, err error) {
-	m := model.Bank{
-		Code: request.Code,
-		Name: request.Name,
+func (Bank) Create(entity *model.Bank) error {
+	if err := database.DB.Create(&entity).Error; err != nil {
+		return err
 	}
-	if err := database.DB.Create(&m).Error; err != nil {
-		return nil, err
-	}
-	return &m, nil
+	return nil
 }
 
 func (Bank) Patch(id string, d interface{}) (err error) {
