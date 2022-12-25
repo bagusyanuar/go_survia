@@ -5,23 +5,34 @@ import (
 	"go-survia/src/lib"
 	"go-survia/src/repositories"
 	request "go-survia/src/request/admin"
+	"go-survia/src/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-type Category struct{}
+type Category struct {
+	service service.Category
+}
 
 var categoryRepository repositories.Category
 
-func (category Category) Index(c *gin.Context) {
+func (category *Category) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		category.post(c)
+		// category.post(c)
+		var r request.AdminCategoryRequest
+		c.Bind(&r)
+		data, err := category.service.Create(&r)
+		if err != nil {
+			lib.JSONErrorResponse(c, err.Error(), data)
+			return
+		}
+		lib.JSONSuccessResponse(c, data)
 		return
 	}
 	q := c.Query("q")
-	data, err := categoryRepository.All(q)
+	data, err := category.service.FindAll(q)
 	if err != nil {
 		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
@@ -61,19 +72,22 @@ func (category Category) FindByID(c *gin.Context) {
 }
 
 func (Category) post(c *gin.Context) {
-	var r request.AdminCategoryRequest
-	c.Bind(&r)
-	m, e := lib.ValidateRequest(&r)
-	if e != nil {
-		lib.JSONBadRequestResponse(c, "invalid data request", m)
-		return
-	}
-	_, err := categoryRepository.Create(&r)
-	if err != nil {
-		lib.JSONErrorResponse(c, "internal server error", nil)
-		return
-	}
-	lib.JSONSuccessResponse(c, nil)
+	// var r request.AdminCategoryRequest
+	// c.Bind(&r)
+	// m, e := lib.ValidateRequest(&r)
+	// if e != nil {
+	// 	lib.JSONBadRequestResponse(c, "invalid data request", m)
+	// 	return
+	// }
+	// entity := model.Category{
+	// 	Name: r.Name,
+	// }
+	// _, err := categoryRepository.Create(&entity)
+	// if err != nil {
+	// 	lib.JSONErrorResponse(c, "internal server error", nil)
+	// 	return
+	// }
+	// lib.JSONSuccessResponse(c, nil)
 }
 
 func (Category) patch(c *gin.Context, id string) {
