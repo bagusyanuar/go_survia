@@ -24,11 +24,11 @@ func (Campaign) FindByID(id string) (r *adminResponse.APICampaign, err error) {
 	return campaign, nil
 }
 
-func (Campaign) Create(m *model.Campaign) (r *model.Campaign, err error) {
-	if err := database.DB.Create(&m).Error; err != nil {
-		return nil, err
+func (Campaign) Create(entity *model.Campaign) error {
+	if err := database.DB.Create(&entity).Error; err != nil {
+		return err
 	}
-	return m, nil
+	return nil
 }
 
 func (Campaign) Patch(m *model.Campaign, d interface{}) (r *model.Campaign, err error) {

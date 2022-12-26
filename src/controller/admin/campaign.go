@@ -6,6 +6,7 @@ import (
 	"go-survia/src/model"
 	"go-survia/src/repositories"
 	request "go-survia/src/request/admin"
+	"go-survia/src/service"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -16,13 +17,37 @@ import (
 	"gorm.io/gorm"
 )
 
-type Campaign struct{}
+type Campaign struct {
+	service service.Campaign
+	request request.AdminCampaign
+}
 
 var campaignRepository repositories.Campaign
 
-func (campaign Campaign) Index(c *gin.Context) {
+func (campaign *Campaign) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		campaign.post(c)
+		// campaign.post(c)
+		c.Bind(&campaign.request)
+		messages, file, fileName, err := campaign.service.Create(&campaign.request)
+		lib.JSONSuccessResponse(c, file)
+		return
+		if err != nil {
+			if errors.Is(err, lib.ErrBadRequest) {
+				lib.JSONBadRequestResponse(c, err.Error(), messages)
+				return
+			}
+			lib.JSONErrorResponse(c, err.Error(), nil)
+			return
+		}
+
+		if file != nil {
+			if errorUpload := c.SaveUploadedFile(file, *fileName); errorUpload != nil {
+				lib.JSONErrorResponse(c, errorUpload.Error(), nil)
+				return
+			}
+		}
+
+		lib.JSONSuccessResponse(c, nil)
 		return
 	}
 	q := c.Query("q")
@@ -208,30 +233,30 @@ func (campaign *Campaign) FindByID(c *gin.Context) {
 }
 
 func (campaign Campaign) post(c *gin.Context) {
-	var r request.AdminCampaignRequest
-	c.Bind(&r)
-	m, e := lib.ValidateRequest(&r)
-	if e != nil {
-		lib.JSONBadRequestResponse(c, "invalid data request", m)
-		return
-	}
+	// var r request.AdminCampaignRequest
+	// c.Bind(&r)
+	// m, e := lib.ValidateRequest(&r)
+	// if e != nil {
+	// 	lib.JSONBadRequestResponse(c, "invalid data request", m)
+	// 	return
+	// }
 
-	model, e := campaign.postData(c, &r)
-	if e != nil {
-		lib.JSONErrorResponse(c, e.Error(), nil)
-		return
-	}
+	// model, e := campaign.postData(c, &r)
+	// if e != nil {
+	// 	lib.JSONErrorResponse(c, e.Error(), nil)
+	// 	return
+	// }
 
-	res, e := campaignRepository.Create(model)
-	if e != nil {
-		lib.JSONErrorResponse(c, e.Error(), nil)
-		return
-	}
-	lib.JSONSuccessResponse(c, res)
+	// res, e := campaignRepository.Create(model)
+	// if e != nil {
+	// 	lib.JSONErrorResponse(c, e.Error(), nil)
+	// 	return
+	// }
+	// lib.JSONSuccessResponse(c, res)
 
 }
 
-func (Campaign) postData(c *gin.Context, r *request.AdminCampaignRequest) (m *model.Campaign, err error) {
+func (Campaign) postData(c *gin.Context, r *request.AdminCampaign) (m *model.Campaign, err error) {
 	var startAt *datatypes.Date
 	var finishAt *datatypes.Date
 	var image *string

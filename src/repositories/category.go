@@ -8,13 +8,6 @@ import (
 
 type Category struct{}
 
-// type CategoryResponse struct {
-// 	ID   uuid.UUID `json:"id"`
-// 	Name string    `json:"name"`
-// }
-
-// var apiCategories []CategoryResponse
-
 //admin
 func (Category) All(q string) (b []adminResponse.APICategory, err error) {
 	var categories []adminResponse.APICategory

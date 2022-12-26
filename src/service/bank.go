@@ -28,6 +28,30 @@ func (bank *Bank) Create(request *adminRequest.AdminBank) (d interface{}, err er
 	return nil, nil
 }
 
+func (bank *Bank) Patch(id string, request *adminRequest.AdminBank) (d interface{}, err error) {
+	messages, e := lib.ValidateRequest(request)
+	if e != nil {
+		return messages, lib.ErrBadRequest
+	}
+	data := map[string]interface{}{
+		"name": request.Name,
+		"code": request.Code,
+	}
+	return nil, bank.repository.Patch(id, data)
+}
+
+func (bank *Bank) Delete(id string) error {
+	return bank.repository.Delete(id)
+}
+
 func (bank *Bank) FindAll(q string) (b []adminResponse.APIBank, err error) {
 	return bank.repository.All(q)
+}
+
+func (bank *Bank) FindByID(id string) (r *adminResponse.APIBank, err error) {
+	entity, e := bank.repository.FindByID(id)
+	if e != nil {
+		return nil, e
+	}
+	return entity, nil
 }

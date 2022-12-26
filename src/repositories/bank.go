@@ -8,7 +8,6 @@ import (
 
 type Bank struct{}
 
-//admin
 func (Bank) All(q string) (b []adminResponse.APIBank, err error) {
 	var banks []adminResponse.APIBank
 	if err = database.DB.Unscoped().Model(&model.Bank{}).Where("name LIKE ?", "%"+q+"%").Find(&banks).Error; err != nil {
@@ -31,17 +30,15 @@ func (Bank) Create(entity *model.Bank) error {
 	return nil
 }
 
-func (Bank) Patch(id string, d interface{}) (err error) {
-	var bank *model.Bank
-	if err = database.DB.Model(&bank).Where("id = ?", id).Updates(d).Error; err != nil {
+func (Bank) Patch(id string, d interface{}) error {
+	if err := database.DB.Debug().Model(&model.Bank{}).Where("id = ?", id).Updates(d).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (Bank) Delete(id string) (err error) {
-	var bank *model.Bank
-	if err = database.DB.Where("id = ?", id).Delete(&bank).Error; err != nil {
+func (Bank) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.Bank{}).Error; err != nil {
 		return err
 	}
 	return nil
