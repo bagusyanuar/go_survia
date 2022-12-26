@@ -31,15 +31,15 @@ func (Campaign) Create(entity *model.Campaign) error {
 	return nil
 }
 
-func (Campaign) Patch(m *model.Campaign, d interface{}) (r *model.Campaign, err error) {
-	if err = database.DB.Model(&m).Updates(d).Error; err != nil {
-		return m, err
+func (Campaign) Patch(id string, d interface{}) error {
+	if err := database.DB.Model(&model.Campaign{}).Where("id = ?", id).Updates(d).Error; err != nil {
+		return err
 	}
-	return m, nil
+	return nil
 }
 
-func (Campaign) Delete(m *model.Campaign) (err error) {
-	if err = database.DB.Delete(&m).Error; err != nil {
+func (Campaign) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.Campaign{}).Error; err != nil {
 		return err
 	}
 	return nil
