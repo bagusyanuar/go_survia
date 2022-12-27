@@ -5,6 +5,8 @@ import (
 	"go-survia/src/lib"
 	"go-survia/src/model"
 	"go-survia/src/repositories"
+	request "go-survia/src/request/admin"
+	"go-survia/src/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type Province struct{}
+type Province struct {
+	request request.AdminProvince
+	service service.Province
+}
 type provinceRequest struct {
 	Code int    `form:"code" validate:"required"`
 	Name string `form:"name" validate:"required"`
@@ -20,9 +25,20 @@ type provinceRequest struct {
 
 var provinceRepository repositories.Province
 
-func (Province) Index(c *gin.Context) {
+func (province *Province) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		postNewProvince(c)
+		// postNewProvince(c)
+		c.Bind(&province.request)
+
+		if m, e := province.service.ValidateRequest(&province.request); e != nil {
+			lib.JSONBadRequestResponse(c, e.Error(), m)
+			return
+		}
+
+		if e := province.service.Create(&province.request); e != nil {
+			lib.JSONErrorResponse(c, e.Error(), nil)
+		}
+		lib.JSONSuccessResponse(c, nil)
 		return
 	}
 	q := c.Query("q")
@@ -79,37 +95,37 @@ func (Province) FindByID(c *gin.Context) {
 }
 
 func postNewProvince(c *gin.Context) {
-	var r provinceRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
+	// var r provinceRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
 
-	model := model.Province{
-		Code: r.Code,
-		Name: r.Name,
-	}
-	data, err := provinceRepository.Create(&model)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    data,
-	})
+	// model := model.Province{
+	// 	Code: r.Code,
+	// 	Name: r.Name,
+	// }
+	// data, err := provinceRepository.Create(&model)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    data,
+	// })
 }
 
 func patchProvince(c *gin.Context, d *model.Province) {

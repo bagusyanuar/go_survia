@@ -23,11 +23,11 @@ func (Province) FindByID(id string) (r *model.Province, err error) {
 	return province, nil
 }
 
-func (Province) Create(m *model.Province) (r *model.Province, err error) {
+func (Province) Create(m *model.Province) error {
 	if err := database.DB.Create(&m).Error; err != nil {
-		return nil, err
+		return err
 	}
-	return m, nil
+	return nil
 }
 
 func (Province) Patch(m *model.Province, d interface{}) (r *model.Province, err error) {
