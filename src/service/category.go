@@ -42,7 +42,7 @@ func (category *Category) Delete(id string) error {
 	return category.repository.Delete(id)
 }
 
-func (category *Category) FindAll(q string) (b []adminResponse.APICategory, err error) {
+func (category *Category) FindAll(q string) (res []model.Category, err error) {
 	return category.repository.All(q)
 }
 

@@ -79,13 +79,13 @@ func (Province) FindByID(c *gin.Context) {
 	}
 
 	if c.Request.Method == "PATCH" {
-		patchProvince(c, data)
-		return
+		// patchProvince(c, data)
+		// return
 	}
 
 	if c.Request.Method == "DELETE" {
-		deleteProvince(c, data)
-		return
+		// deleteProvince(c, data)
+		// return
 	}
 	c.JSON(http.StatusOK, lib.Response{
 		Code:    http.StatusOK,
