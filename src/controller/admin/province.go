@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -28,17 +27,17 @@ var provinceRepository repositories.Province
 func (province *Province) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
 		// postNewProvince(c)
-		c.Bind(&province.request)
+		// c.Bind(&province.request)
 
-		if m, e := province.service.ValidateRequest(&province.request); e != nil {
-			lib.JSONBadRequestResponse(c, e.Error(), m)
-			return
-		}
+		// if m, e := province.service.ValidateRequest(&province.request); e != nil {
+		// 	lib.JSONBadRequestResponse(c, e.Error(), m)
+		// 	return
+		// }
 
-		if e := province.service.Create(&province.request); e != nil {
-			lib.JSONErrorResponse(c, e.Error(), nil)
-		}
-		lib.JSONSuccessResponse(c, nil)
+		// if e := province.service.Create(&province.request); e != nil {
+		// 	lib.JSONErrorResponse(c, e.Error(), nil)
+		// }
+		// lib.JSONSuccessResponse(c, nil)
 		return
 	}
 	q := c.Query("q")
@@ -129,50 +128,50 @@ func postNewProvince(c *gin.Context) {
 }
 
 func patchProvince(c *gin.Context, d *model.Province) {
-	var r provinceRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
-	data := map[string]interface{}{
-		"code": r.Code,
-		"name": r.Name,
-	}
-	result, err := provinceRepository.Patch(d, data)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    result,
-	})
+	// var r provinceRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
+	// data := map[string]interface{}{
+	// 	"code": r.Code,
+	// 	"name": r.Name,
+	// }
+	// result, err := provinceRepository.Patch(d, data)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    result,
+	// })
 }
 
 func deleteProvince(c *gin.Context, d *model.Province) {
-	err := provinceRepository.Delete(d)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-	})
+	// err := provinceRepository.Delete(d)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// })
 }

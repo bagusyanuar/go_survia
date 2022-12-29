@@ -79,47 +79,47 @@ func (City) FindByID(c *gin.Context) {
 	})
 }
 func postNewCity(c *gin.Context) {
-	var r cityRequest
-	c.Bind(&r)
+	// var r cityRequest
+	// c.Bind(&r)
 
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
 
-	provinceId, e := uuid.Parse(r.ProvinceID)
-	if e != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid province id format",
-		})
-		return
-	}
-	model := model.City{
-		ProvinceID: provinceId,
-		Code:       r.Code,
-		Name:       r.Name,
-	}
-	data, err := cityRepository.Create(&model)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    data,
-	})
+	// provinceId, e := uuid.Parse(r.ProvinceID)
+	// if e != nil {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid province id format",
+	// 	})
+	// 	return
+	// }
+	// model := model.City{
+	// 	ProvinceID: provinceId,
+	// 	Code:       r.Code,
+	// 	Name:       r.Name,
+	// }
+	// data, err := cityRepository.Create(&model)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    data,
+	// })
 }
 
 func patchCity(c *gin.Context, d *model.City) {

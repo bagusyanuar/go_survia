@@ -7,8 +7,8 @@ import (
 
 type City struct{}
 
-func (City) All(q string) (b []model.City, err error) {
-	var cities []model.City
+func (City) All(q string) (b []model.CityWithProvince, err error) {
+	var cities []model.CityWithProvince
 	if err = database.DB.Unscoped().Model(&model.City{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&cities).Error; err != nil {
 		return cities, err
 	}
@@ -23,11 +23,11 @@ func (City) FindByID(id string) (r *model.City, err error) {
 	return city, nil
 }
 
-func (City) Create(m *model.City) (r *model.City, err error) {
+func (City) Create(m *model.City) error {
 	if err := database.DB.Create(&m).Error; err != nil {
-		return nil, err
+		return err
 	}
-	return m, nil
+	return nil
 }
 
 func (City) Patch(m *model.City, d interface{}) (r *model.City, err error) {

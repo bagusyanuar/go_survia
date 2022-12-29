@@ -29,10 +29,7 @@ func InitRoutes() *gin.Engine {
 	})
 
 	authController := AuthController.AuthAdmin{}
-	adminCategoryController := AdminController.Category{}
 	adminCampaignController := AdminController.Campaign{}
-	adminBankController := AdminController.Bank{}
-	adminProvinceController := AdminController.Province{}
 	adminCityController := AdminController.City{}
 	adminJobController := AdminController.Job{}
 	adminSecController := AdminController.Sec{}
@@ -41,6 +38,9 @@ func InitRoutes() *gin.Engine {
 	memberCategoryController := MemberController.Category{}
 
 	categoryController := controller.Category{}
+	bankController := controller.Bank{}
+	provinceController := controller.Province{}
+	cityController := controller.City{}
 
 	api := route.Group("/api")
 	{
@@ -61,11 +61,38 @@ func InitRoutes() *gin.Engine {
 			{
 				category := admin.Group("/category")
 				{
-					category.GET("", categoryController.GetData)
-					category.POST("", adminCategoryController.Index)
-					category.GET("/:id", adminCategoryController.FindByID)
-					category.PATCH("/:id", adminCategoryController.FindByID)
-					category.DELETE("/:id", adminCategoryController.FindByID)
+					category.GET("", categoryController.Index)
+					category.POST("", categoryController.Store)
+					category.GET("/:id", categoryController.Show)
+					category.PATCH("/:id", categoryController.Update)
+					category.DELETE("/:id", categoryController.Destroy)
+				}
+
+				bank := admin.Group("/bank")
+				{
+					bank.GET("", bankController.Index)
+					bank.POST("", bankController.Store)
+					bank.GET("/:id", bankController.Show)
+					bank.PATCH("/:id", bankController.Update)
+					bank.DELETE("/:id", bankController.Destroy)
+				}
+
+				province := admin.Group("/province")
+				{
+					province.GET("", provinceController.Index)
+					province.POST("", provinceController.Store)
+					province.GET("/:id", provinceController.Show)
+					province.PATCH("/:id", provinceController.Update)
+					province.DELETE("/:id", provinceController.Destroy)
+				}
+
+				city := admin.Group("/city")
+				{
+					city.GET("", cityController.Index)
+					city.POST("", cityController.Store)
+					city.GET("/:id", adminCityController.FindByID)
+					city.PATCH("/:id", adminCityController.FindByID)
+					city.DELETE("/:id", adminCityController.FindByID)
 				}
 
 				campaign := admin.Group("/campaign")
@@ -75,32 +102,6 @@ func InitRoutes() *gin.Engine {
 					campaign.GET("/:id", adminCampaignController.FindByID)
 					campaign.PATCH("/:id", adminCampaignController.FindByID)
 					campaign.DELETE("/:id", adminCampaignController.FindByID)
-				}
-				bank := admin.Group("/bank")
-				{
-					bank.GET("", adminBankController.Index)
-					bank.POST("", adminBankController.Index)
-					bank.GET("/:id", adminBankController.FindByID)
-					bank.PATCH("/:id", adminBankController.FindByID)
-					bank.DELETE("/:id", adminBankController.FindByID)
-				}
-
-				province := admin.Group("/province")
-				{
-					province.GET("", adminProvinceController.Index)
-					province.POST("", adminProvinceController.Index)
-					province.GET("/:id", adminProvinceController.FindByID)
-					province.PATCH("/:id", adminProvinceController.FindByID)
-					province.DELETE("/:id", adminProvinceController.FindByID)
-				}
-
-				city := admin.Group("/city")
-				{
-					city.GET("", adminCityController.Index)
-					city.POST("", adminCityController.Index)
-					city.GET("/:id", adminCityController.FindByID)
-					city.PATCH("/:id", adminCityController.FindByID)
-					city.DELETE("/:id", adminCityController.FindByID)
 				}
 
 				job := admin.Group("/job")

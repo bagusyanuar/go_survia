@@ -17,17 +17,17 @@ type Bank struct {
 
 func (bank *Bank) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		c.Bind(&bank.request)
-		messages, err := bank.service.Create(&bank.request)
-		if err != nil {
-			if errors.Is(err, lib.ErrBadRequest) {
-				lib.JSONBadRequestResponse(c, err.Error(), messages)
-				return
-			}
-			lib.JSONErrorResponse(c, err.Error(), nil)
-			return
-		}
-		lib.JSONSuccessResponse(c, nil)
+		// c.Bind(&bank.request)
+		// messages, err := bank.service.Create(&bank.request)
+		// if err != nil {
+		// 	if errors.Is(err, lib.ErrBadRequest) {
+		// 		lib.JSONBadRequestResponse(c, err.Error(), messages)
+		// 		return
+		// 	}
+		// 	lib.JSONErrorResponse(c, err.Error(), nil)
+		// 	return
+		// }
+		// lib.JSONSuccessResponse(c, nil)
 		return
 	}
 	q := c.Query("q")
@@ -44,17 +44,17 @@ func (bank Bank) FindByID(c *gin.Context) {
 
 	//update method
 	if c.Request.Method == "PATCH" {
-		c.Bind(&bank.request)
-		messages, err := bank.service.Patch(id, &bank.request)
-		if err != nil {
-			if errors.Is(err, lib.ErrBadRequest) {
-				lib.JSONBadRequestResponse(c, err.Error(), messages)
-				return
-			}
-			lib.JSONErrorResponse(c, err.Error(), nil)
-			return
-		}
-		lib.JSONSuccessResponse(c, nil)
+		// c.Bind(&bank.request)
+		// messages, err := bank.service.Patch(id, &bank.request)
+		// if err != nil {
+		// 	if errors.Is(err, lib.ErrBadRequest) {
+		// 		lib.JSONBadRequestResponse(c, err.Error(), messages)
+		// 		return
+		// 	}
+		// 	lib.JSONErrorResponse(c, err.Error(), nil)
+		// 	return
+		// }
+		// lib.JSONSuccessResponse(c, nil)
 		return
 	}
 

@@ -3,7 +3,7 @@ package admin
 import (
 	"errors"
 	"go-survia/src/lib"
-	request "go-survia/src/request/admin"
+	request "go-survia/src/request"
 	"go-survia/src/service"
 
 	"github.com/gin-gonic/gin"
@@ -12,22 +12,22 @@ import (
 
 type Category struct {
 	service service.Category
-	request request.AdminCategory
+	request request.Category
 }
 
 func (category *Category) Index(c *gin.Context) {
 	if c.Request.Method == "POST" {
-		c.Bind(&category.request)
-		messages, err := category.service.Create(&category.request)
-		if err != nil {
-			if errors.Is(err, lib.ErrBadRequest) {
-				lib.JSONBadRequestResponse(c, err.Error(), messages)
-				return
-			}
-			lib.JSONErrorResponse(c, err.Error(), nil)
-			return
-		}
-		lib.JSONSuccessResponse(c, nil)
+		// c.Bind(&category.request)
+		// messages, err := category.service.Create(&category.request)
+		// if err != nil {
+		// 	if errors.Is(err, lib.ErrBadRequest) {
+		// 		lib.JSONBadRequestResponse(c, err.Error(), messages)
+		// 		return
+		// 	}
+		// 	lib.JSONErrorResponse(c, err.Error(), nil)
+		// 	return
+		// }
+		// lib.JSONSuccessResponse(c, nil)
 		return
 	}
 	q := c.Query("q")
@@ -44,18 +44,18 @@ func (category *Category) FindByID(c *gin.Context) {
 
 	//update method
 	if c.Request.Method == "PATCH" {
-		c.Bind(&category.request)
-		messages, err := category.service.Patch(id, &category.request)
-		if err != nil {
-			if errors.Is(err, lib.ErrBadRequest) {
-				lib.JSONBadRequestResponse(c, err.Error(), messages)
-				return
-			}
-			lib.JSONErrorResponse(c, err.Error(), nil)
-			return
-		}
-		lib.JSONSuccessResponse(c, nil)
-		return
+		// c.Bind(&category.request)
+		// messages, err := category.service.Patch(id, &category.request)
+		// if err != nil {
+		// 	if errors.Is(err, lib.ErrBadRequest) {
+		// 		lib.JSONBadRequestResponse(c, err.Error(), messages)
+		// 		return
+		// 	}
+		// 	lib.JSONErrorResponse(c, err.Error(), nil)
+		// 	return
+		// }
+		// lib.JSONSuccessResponse(c, nil)
+		// return
 	}
 
 	//delete method

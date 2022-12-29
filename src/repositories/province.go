@@ -3,21 +3,20 @@ package repositories
 import (
 	"go-survia/database"
 	"go-survia/src/model"
-	adminResponse "go-survia/src/response/admin"
 )
 
 type Province struct{}
 
-func (Province) All(q string) (r []adminResponse.APIProvince, err error) {
-	var provinces []adminResponse.APIProvince
+func (Province) All(q string) (res []model.Province, err error) {
+	var provinces []model.Province
 	if err = database.DB.Unscoped().Model(&model.Province{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&provinces).Error; err != nil {
 		return provinces, err
 	}
 	return provinces, nil
 }
 
-func (Province) FindByID(id string) (r *adminResponse.APIProvince, err error) {
-	var province *adminResponse.APIProvince
+func (Province) FindByID(id string) (res *model.Province, err error) {
+	var province *model.Province
 	if err = database.DB.Model(&model.Province{}).First(&province, "id = ?", id).Error; err != nil {
 		return province, err
 	}
@@ -31,15 +30,15 @@ func (Province) Create(m *model.Province) error {
 	return nil
 }
 
-func (Province) Patch(m *model.Province, d interface{}) (r *model.Province, err error) {
-	if err = database.DB.Model(&m).Updates(d).Error; err != nil {
-		return m, err
+func (Province) Patch(id string, d interface{}) error {
+	if err := database.DB.Debug().Model(&model.Province{}).Where("id = ?", id).Updates(d).Error; err != nil {
+		return err
 	}
-	return m, nil
+	return nil
 }
 
-func (Province) Delete(m *model.Province) (err error) {
-	if err = database.DB.Delete(&m).Error; err != nil {
+func (Province) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.Province{}).Error; err != nil {
 		return err
 	}
 	return nil
