@@ -90,7 +90,7 @@ func InitRoutes() *gin.Engine {
 				{
 					city.GET("", cityController.Index)
 					city.POST("", cityController.Store)
-					city.GET("/:id", adminCityController.FindByID)
+					city.GET("/:id", cityController.Show)
 					city.PATCH("/:id", adminCityController.FindByID)
 					city.DELETE("/:id", adminCityController.FindByID)
 				}

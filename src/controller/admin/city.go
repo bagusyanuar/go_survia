@@ -64,12 +64,12 @@ func (City) FindByID(c *gin.Context) {
 		return
 	}
 	if c.Request.Method == "PATCH" {
-		patchCity(c, data)
+		// patchCity(c, data)
 		return
 	}
 
 	if c.Request.Method == "DELETE" {
-		deleteCity(c, data)
+		// deleteCity(c, data)
 		return
 	}
 	c.JSON(http.StatusOK, lib.Response{

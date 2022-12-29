@@ -36,7 +36,7 @@ type CityWithProvince struct {
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `json:"deleted_at"`
-	Province   *Province      `gorm:"foreignKey:ProvinceID"`
+	Province   *Province      `gorm:"foreignKey:ProvinceID" json:"province"`
 }
 
 func (cityWithProvince *CityWithProvince) BeforeCreate(tx *gorm.DB) (err error) {

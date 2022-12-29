@@ -13,7 +13,6 @@ type City struct {
 }
 
 func (city *City) Create(r *req.City) error {
-
 	provinceID, e := uuid.Parse(r.ProvinceID)
 	if e != nil {
 		return e
@@ -31,4 +30,12 @@ func (city *City) Create(r *req.City) error {
 
 func (city *City) FindAll(q string) (d []model.CityWithProvince, err error) {
 	return city.repository.All(q)
+}
+
+func (city *City) FindByID(id string) (d *model.CityWithProvince, err error) {
+	data, e := city.repository.FindByID(id)
+	if e != nil {
+		return nil, e
+	}
+	return data, nil
 }
