@@ -8,8 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -123,59 +121,59 @@ func postNewCity(c *gin.Context) {
 }
 
 func patchCity(c *gin.Context, d *model.City) {
-	var r cityRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
-	provinceId, e := uuid.Parse(r.ProvinceID)
-	if e != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid province id format",
-		})
-		return
-	}
-	data := map[string]interface{}{
-		"province_id": provinceId,
-		"code":        r.Code,
-		"name":        r.Name,
-	}
-	result, err := cityRepository.Patch(d, data)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    result,
-	})
+	// var r cityRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
+	// provinceId, e := uuid.Parse(r.ProvinceID)
+	// if e != nil {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid province id format",
+	// 	})
+	// 	return
+	// }
+	// data := map[string]interface{}{
+	// 	"province_id": provinceId,
+	// 	"code":        r.Code,
+	// 	"name":        r.Name,
+	// }
+	// result, err := cityRepository.Patch(d, data)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    result,
+	// })
 }
 
 func deleteCity(c *gin.Context, d *model.City) {
-	err := cityRepository.Delete(d)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-	})
+	// err := cityRepository.Delete(d)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// })
 }

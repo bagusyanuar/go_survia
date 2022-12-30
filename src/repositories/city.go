@@ -37,15 +37,15 @@ func (City) Create(m *model.City) error {
 	return nil
 }
 
-func (City) Patch(m *model.City, d interface{}) (r *model.City, err error) {
-	if err = database.DB.Model(&m).Updates(d).Error; err != nil {
-		return m, err
+func (City) Patch(id string, d interface{}) error {
+	if err := database.DB.Debug().Model(&model.City{}).Where("id = ?", id).Updates(d).Error; err != nil {
+		return err
 	}
-	return m, nil
+	return nil
 }
 
-func (City) Delete(m *model.City) (err error) {
-	if err = database.DB.Delete(&m).Error; err != nil {
+func (City) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.City{}).Error; err != nil {
 		return err
 	}
 	return nil

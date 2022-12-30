@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -78,82 +77,82 @@ func (Job) FindByID(c *gin.Context) {
 }
 
 func postNewJob(c *gin.Context) {
-	var r jobRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
+	// var r jobRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
 
-	model := model.Job{
-		Name: r.Name,
-	}
-	data, err := jobRepository.Create(&model)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    data,
-	})
+	// model := model.Job{
+	// 	Name: r.Name,
+	// }
+	// data, err := jobRepository.Create(&model)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    data,
+	// })
 }
 
 func patchJob(c *gin.Context, d *model.Job) {
-	var r jobRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
-	data := map[string]interface{}{
-		"name": r.Name,
-	}
-	result, err := jobRepository.Patch(d, data)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    result,
-	})
+	// var r jobRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
+	// data := map[string]interface{}{
+	// 	"name": r.Name,
+	// }
+	// result, err := jobRepository.Patch(d, data)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    result,
+	// })
 }
 
 func deleteJob(c *gin.Context, d *model.Job) {
-	err := jobRepository.Delete(d)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-	})
+	// err := jobRepository.Delete(d)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// })
 }

@@ -30,8 +30,6 @@ func InitRoutes() *gin.Engine {
 
 	authController := AuthController.AuthAdmin{}
 	adminCampaignController := AdminController.Campaign{}
-	adminCityController := AdminController.City{}
-	adminJobController := AdminController.Job{}
 	adminSecController := AdminController.Sec{}
 	adminSecQuestionController := AdminController.SecQuestion{}
 
@@ -41,6 +39,8 @@ func InitRoutes() *gin.Engine {
 	bankController := controller.Bank{}
 	provinceController := controller.Province{}
 	cityController := controller.City{}
+	jobController := controller.Job{}
+	secController := controller.Sec{}
 
 	api := route.Group("/api")
 	{
@@ -91,8 +91,26 @@ func InitRoutes() *gin.Engine {
 					city.GET("", cityController.Index)
 					city.POST("", cityController.Store)
 					city.GET("/:id", cityController.Show)
-					city.PATCH("/:id", adminCityController.FindByID)
-					city.DELETE("/:id", adminCityController.FindByID)
+					city.PATCH("/:id", cityController.Update)
+					city.DELETE("/:id", cityController.Destroy)
+				}
+
+				job := admin.Group("/job")
+				{
+					job.GET("", jobController.Index)
+					job.POST("", jobController.Store)
+					job.GET("/:id", jobController.Show)
+					job.PATCH("/:id", jobController.Update)
+					job.DELETE("/:id", jobController.Destroy)
+				}
+
+				sec := admin.Group("/sec")
+				{
+					sec.GET("", secController.Index)
+					sec.POST("", secController.Store)
+					sec.GET("/:id", secController.Show)
+					sec.PATCH("/:id", secController.Update)
+					sec.DELETE("/:id", secController.Destroy)
 				}
 
 				campaign := admin.Group("/campaign")
@@ -104,22 +122,6 @@ func InitRoutes() *gin.Engine {
 					campaign.DELETE("/:id", adminCampaignController.FindByID)
 				}
 
-				job := admin.Group("/job")
-				{
-					job.GET("", adminJobController.Index)
-					job.POST("", adminJobController.Index)
-					job.GET("/:id", adminJobController.FindByID)
-					job.PATCH("/:id", adminJobController.FindByID)
-					job.DELETE("/:id", adminJobController.FindByID)
-				}
-				sec := admin.Group("/sec")
-				{
-					sec.GET("", adminSecController.Index)
-					sec.POST("", adminSecController.Index)
-					sec.GET("/:id", adminSecController.FindByID)
-					sec.PATCH("/:id", adminSecController.FindByID)
-					sec.DELETE("/:id", adminSecController.FindByID)
-				}
 				secQuestion := admin.Group("/sec-question")
 				{
 					secQuestion.GET("", adminSecQuestionController.Index)

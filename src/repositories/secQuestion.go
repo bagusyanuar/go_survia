@@ -1,68 +1,70 @@
 package repositories
 
 import (
+	"errors"
 	"go-survia/database"
 	"go-survia/src/model"
-	adminResponse "go-survia/src/response/admin"
 
 	"gorm.io/gorm"
 )
 
 type SecQuestion struct{}
 
-type apiSecQuestionResponse struct {
-	model.SecQuestion
-	Answers []model.SecAnswer `gorm:"foreignKey:SecQuestionID" json:"answers"`
-}
-
-func (SecQuestion) All(q string) (b []adminResponse.APISecQuestionResponse, err error) {
-	var response []adminResponse.APISecQuestionResponse
-	if err = database.DB.Unscoped().Debug().
-		Model(&model.SecQuestion{}).
+func (SecQuestion) All(q string) (d []model.SecQuestionWithAnswers, err error) {
+	var data []model.SecQuestionWithAnswers
+	if err = database.DB.Unscoped().
+		Model(&model.SecQuestionWithAnswers{}).
 		Preload("Answers", func(db *gorm.DB) *gorm.DB {
 			return db.Order("index_of DESC")
 		}).
 		Where("question LIKE ?", "%"+q+"%").
 		Order("created_at ASC").
-		Find(&response).Error; err != nil {
-		return response, err
+		Find(&data).Error; err != nil {
+		return data, err
 	}
-	return response, nil
+	return data, nil
 }
 
-func (SecQuestion) FindByID(id string) (r *adminResponse.APISecQuestionResponse, err error) {
-	var response *adminResponse.APISecQuestionResponse
-	if err = database.DB.Model(&model.SecQuestion{}).Preload("Answers").First(&response, "id = ?", id).Error; err != nil {
-		return response, err
+func (SecQuestion) FindByID(id string) (d *model.SecQuestionWithAnswers, err error) {
+	var data *model.SecQuestionWithAnswers
+	if err = database.DB.Model(&model.SecQuestionWithAnswers{}).Preload("Answers").First(&data, "id = ?", id).Error; err != nil {
+		return data, err
 	}
-	return response, nil
+	return data, nil
 }
 
-func (SecQuestion) Create(m *model.SecQuestion) (r *model.SecQuestion, err error) {
-	if err := database.DB.Create(&m).Error; err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (SecQuestion) Patch(id string, d *apiSecQuestionResponse) (err error) {
-
-	var sq *model.SecQuestion
-	qUpdate := map[string]interface{}{
-		"question": d.Question,
-	}
-
+func (SecQuestion) Create(entity *model.SecQuestionWithAnswers) error {
 	tx := database.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
 		}
 	}()
-	if err = database.DB.Model(&sq).Where("id = ?", id).Updates(qUpdate).Error; err != nil {
-		tx.Rollback()
+
+	if err := database.DB.Create(&entity).Error; err != nil {
 		return err
 	}
-	tx.Commit()
+	return nil
+}
+
+func (SecQuestion) Patch(iid string, d interface{}) (err error) {
+
+	// var sq *model.SecQuestion
+	// qUpdate := map[string]interface{}{
+	// 	"question": d.Question,
+	// }
+
+	// tx := database.DB.Begin()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		tx.Rollback()
+	// 	}
+	// }()
+	// if err = database.DB.Model(&sq).Where("id = ?", id).Updates(qUpdate).Error; err != nil {
+	// 	tx.Rollback()
+	// 	return err
+	// }
+	// tx.Commit()
 	return nil
 }
 
@@ -71,4 +73,16 @@ func (SecQuestion) Delete(m *model.SecQuestion) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (SecQuestion) FindLastIndex() (i int, err error) {
+	value := 0
+	var lastSecQuestion *model.SecQuestion
+	if err := database.DB.Model(&model.SecQuestion{}).Order("index_of DESC").First(&lastSecQuestion).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, err
+		}
+	}
+	value = int(lastSecQuestion.IndexOf) + 1
+	return value, nil
 }

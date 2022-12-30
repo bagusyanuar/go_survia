@@ -28,6 +28,23 @@ func (city *City) Create(r *req.City) error {
 	return nil
 }
 
+func (city *City) Patch(id string, r *req.City) error {
+	provinceID, e := uuid.Parse(r.ProvinceID)
+	if e != nil {
+		return e
+	}
+	data := map[string]interface{}{
+		"name":        r.Name,
+		"code":        r.Code,
+		"province_id": provinceID,
+	}
+	return city.repository.Patch(id, data)
+}
+
+func (city *City) Delete(id string) error {
+	return city.repository.Delete(id)
+}
+
 func (city *City) FindAll(q string) (d []model.CityWithProvince, err error) {
 	return city.repository.All(q)
 }

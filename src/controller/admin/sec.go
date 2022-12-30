@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -80,86 +79,86 @@ func (Sec) FindByID(c *gin.Context) {
 }
 
 func postNewSec(c *gin.Context) {
-	var r secRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
+	// var r secRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
 
-	model := model.Sec{
-		Name: r.Name,
-		Bottom: r.Bottom,
-		Top: r.Top,
-	}
-	data, err := secRepository.Create(&model)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    data,
-	})
+	// model := model.Sec{
+	// 	Name: r.Name,
+	// 	Bottom: r.Bottom,
+	// 	Top: r.Top,
+	// }
+	// data, err := secRepository.Create(&model)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    data,
+	// })
 }
 
 func patchSec(c *gin.Context, d *model.Sec) {
-	var r secRequest
-	c.Bind(&r)
-	v := validator.New()
-	if e := v.Struct(&r); e != nil {
-		messages := lib.ErrorMessageValidation(e)
-		c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
-			Code:    http.StatusBadRequest,
-			Message: "invalid data request",
-			Data:    messages,
-		})
-		return
-	}
-	data := map[string]interface{}{
-		"name": r.Name,
-		"bottom": r.Bottom,
-		"top": r.Top,
-	}
-	result, err := secRepository.Patch(d, data)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data:    result,
-	})
+	// var r secRequest
+	// c.Bind(&r)
+	// v := validator.New()
+	// if e := v.Struct(&r); e != nil {
+	// 	messages := lib.ErrorMessageValidation(e)
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, lib.Response{
+	// 		Code:    http.StatusBadRequest,
+	// 		Message: "invalid data request",
+	// 		Data:    messages,
+	// 	})
+	// 	return
+	// }
+	// data := map[string]interface{}{
+	// 	"name":   r.Name,
+	// 	"bottom": r.Bottom,
+	// 	"top":    r.Top,
+	// }
+	// result, err := secRepository.Patch(d, data)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// 	Data:    result,
+	// })
 }
 
 func deleteSec(c *gin.Context, d *model.Sec) {
-	err := secRepository.Delete(d)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
-			Code:    http.StatusInternalServerError,
-			Data:    nil,
-			Message: err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, lib.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-	})
+	// err := secRepository.Delete(d)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, lib.Response{
+	// 		Code:    http.StatusInternalServerError,
+	// 		Data:    nil,
+	// 		Message: err.Error(),
+	// 	})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, lib.Response{
+	// 	Code:    http.StatusOK,
+	// 	Message: "success",
+	// })
 }

@@ -19,3 +19,21 @@ type City struct {
 	Code       int    `form:"code" validate:"required" json:"code"`
 	Name       string `form:"name" validate:"required" json:"name"`
 }
+
+type Job struct {
+	Name string `form:"name" validate:"required" json:"name"`
+}
+
+type Sec struct {
+	Name   string `form:"name" validate:"required"`
+	Bottom int    `form:"bottom" validate:"required"`
+	Top    int    `form:"top" validate:"required"`
+}
+
+type SecQuestion struct {
+	Question string `json:"question" validate:"required"`
+	Answers  []struct {
+		Answer string `json:"answer" validate:"required"`
+		Score  uint   `json:"score" validate:"required"`
+	} `json:"answers" validate:"required"`
+}

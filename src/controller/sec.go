@@ -10,14 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type City struct {
-	service service.City
-	request req.City
+type Sec struct {
+	service service.Sec
+	request req.Sec
 }
 
-func (city *City) Index(c *gin.Context) {
+func (sec *Sec) Index(c *gin.Context) {
 	q := c.Query("q")
-	data, err := city.service.FindAll(q)
+	data, err := sec.service.FindAll(q)
 	if err != nil {
 		lib.JSONErrorResponse(c, err.Error(), nil)
 		return
@@ -25,23 +25,23 @@ func (city *City) Index(c *gin.Context) {
 	lib.JSONSuccessResponse(c, data)
 }
 
-func (city *City) Store(c *gin.Context) {
-	c.Bind(&city.request)
-	if m, e := lib.ValidateRequest(&city.request); e != nil {
+func (sec *Sec) Store(c *gin.Context) {
+	c.Bind(&sec.request)
+	if m, e := lib.ValidateRequest(&sec.request); e != nil {
 		lib.JSONBadRequestResponse(c, e.Error(), m)
 		return
 	}
 
-	if e := city.service.Create(&city.request); e != nil {
+	if e := sec.service.Create(&sec.request); e != nil {
 		lib.JSONErrorResponse(c, e.Error(), nil)
 		return
 	}
 	lib.JSONSuccessResponse(c, nil)
 }
 
-func (city *City) Show(c *gin.Context) {
+func (sec *Sec) Show(c *gin.Context) {
 	id := c.Param("id")
-	data, e := city.service.FindByID(id)
+	data, e := sec.service.FindByID(id)
 	if e != nil {
 		if errors.Is(e, gorm.ErrRecordNotFound) {
 			lib.JSONNotFoundResponse(c, e.Error(), nil)
@@ -53,23 +53,23 @@ func (city *City) Show(c *gin.Context) {
 	lib.JSONSuccessResponse(c, data)
 }
 
-func (city *City) Update(c *gin.Context) {
+func (sec *Sec) Update(c *gin.Context) {
 	id := c.Param("id")
-	c.Bind(&city.request)
-	if m, e := lib.ValidateRequest(&city.request); e != nil {
+	c.Bind(&sec.request)
+	if m, e := lib.ValidateRequest(&sec.request); e != nil {
 		lib.JSONBadRequestResponse(c, e.Error(), m)
 		return
 	}
-	if e := city.service.Patch(id, &city.request); e != nil {
+	if e := sec.service.Patch(id, &sec.request); e != nil {
 		lib.JSONErrorResponse(c, e.Error(), nil)
 		return
 	}
 	lib.JSONSuccessResponse(c, nil)
 }
 
-func (city *City) Destroy(c *gin.Context) {
+func (sec *Sec) Destroy(c *gin.Context) {
 	id := c.Param("id")
-	if e := city.service.Delete(id); e != nil {
+	if e := sec.service.Delete(id); e != nil {
 		lib.JSONErrorResponse(c, e.Error(), nil)
 		return
 	}

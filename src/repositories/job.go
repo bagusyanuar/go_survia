@@ -7,7 +7,7 @@ import (
 
 type Job struct{}
 
-func (Job) All(q string) (b []model.Job, err error) {
+func (Job) All(q string) (d []model.Job, err error) {
 	var jobs []model.Job
 	if err = database.DB.Unscoped().Model(&model.Job{}).Where("name LIKE ?", "%"+q+"%").Order("created_at ASC").Find(&jobs).Error; err != nil {
 		return jobs, err
@@ -15,7 +15,7 @@ func (Job) All(q string) (b []model.Job, err error) {
 	return jobs, nil
 }
 
-func (Job) FindByID(id string) (r *model.Job, err error) {
+func (Job) FindByID(id string) (d *model.Job, err error) {
 	var job *model.Job
 	if err = database.DB.Model(&model.Job{}).First(&job, "id = ?", id).Error; err != nil {
 		return job, err
@@ -23,22 +23,22 @@ func (Job) FindByID(id string) (r *model.Job, err error) {
 	return job, nil
 }
 
-func (Job) Create(m *model.Job) (r *model.Job, err error) {
-	if err := database.DB.Create(&m).Error; err != nil {
-		return nil, err
+func (Job) Create(entity *model.Job) error {
+	if err := database.DB.Create(&entity).Error; err != nil {
+		return err
 	}
-	return m, nil
+	return nil
 }
 
-func (Job) Patch(m *model.Job, d interface{}) (r *model.Job, err error) {
-	if err = database.DB.Model(&m).Updates(d).Error; err != nil {
-		return m, err
+func (Job) Patch(id string, d interface{}) error {
+	if err := database.DB.Debug().Model(&model.Job{}).Where("id = ?", id).Updates(d).Error; err != nil {
+		return err
 	}
-	return m, nil
+	return nil
 }
 
-func (Job) Delete(m *model.Job) (err error) {
-	if err = database.DB.Delete(&m).Error; err != nil {
+func (Job) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.Job{}).Error; err != nil {
 		return err
 	}
 	return nil
