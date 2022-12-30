@@ -30,9 +30,6 @@ func InitRoutes() *gin.Engine {
 
 	authController := AuthController.AuthAdmin{}
 	adminCampaignController := AdminController.Campaign{}
-	adminSecController := AdminController.Sec{}
-	adminSecQuestionController := AdminController.SecQuestion{}
-
 	memberCategoryController := MemberController.Category{}
 
 	categoryController := controller.Category{}
@@ -41,6 +38,7 @@ func InitRoutes() *gin.Engine {
 	cityController := controller.City{}
 	jobController := controller.Job{}
 	secController := controller.Sec{}
+	secQuestionController := controller.SecQuestion{}
 
 	api := route.Group("/api")
 	{
@@ -113,6 +111,15 @@ func InitRoutes() *gin.Engine {
 					sec.DELETE("/:id", secController.Destroy)
 				}
 
+				secQuestion := admin.Group("/sec-question")
+				{
+					secQuestion.GET("", secQuestionController.Index)
+					secQuestion.POST("", secQuestionController.Store)
+					// secQuestion.GET("/:id", secQuestionController.FindByID)
+					// secQuestion.PATCH("/:id", secQuestionController.FindByID)
+					// secQuestion.DELETE("/:id", secQuestionController.FindByID)
+				}
+
 				campaign := admin.Group("/campaign")
 				{
 					campaign.GET("", adminCampaignController.Index)
@@ -122,14 +129,7 @@ func InitRoutes() *gin.Engine {
 					campaign.DELETE("/:id", adminCampaignController.FindByID)
 				}
 
-				secQuestion := admin.Group("/sec-question")
-				{
-					secQuestion.GET("", adminSecQuestionController.Index)
-					secQuestion.POST("", adminSecQuestionController.Index)
-					secQuestion.GET("/:id", adminSecQuestionController.FindByID)
-					secQuestion.PATCH("/:id", adminSecController.FindByID)
-					secQuestion.DELETE("/:id", adminSecQuestionController.FindByID)
-				}
+				
 			}
 
 			member := v1.Group("/member")

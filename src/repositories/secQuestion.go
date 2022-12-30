@@ -15,10 +15,10 @@ func (SecQuestion) All(q string) (d []model.SecQuestionWithAnswers, err error) {
 	if err = database.DB.Unscoped().
 		Model(&model.SecQuestionWithAnswers{}).
 		Preload("Answers", func(db *gorm.DB) *gorm.DB {
-			return db.Order("index_of DESC")
+			return db.Order("index_of ASC")
 		}).
 		Where("question LIKE ?", "%"+q+"%").
-		Order("created_at ASC").
+		Order("index_of ASC").
 		Find(&data).Error; err != nil {
 		return data, err
 	}
@@ -40,36 +40,24 @@ func (SecQuestion) Create(entity *model.SecQuestionWithAnswers) error {
 			tx.Rollback()
 		}
 	}()
-
 	if err := database.DB.Create(&entity).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+}
+
+func (SecQuestion) Patch(id string, d interface{}) error {
+
+	if err := database.DB.Debug().Model(&model.SecQuestionWithAnswers{}).Where("id = ?", id).Updates(d).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (SecQuestion) Patch(iid string, d interface{}) (err error) {
-
-	// var sq *model.SecQuestion
-	// qUpdate := map[string]interface{}{
-	// 	"question": d.Question,
-	// }
-
-	// tx := database.DB.Begin()
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		tx.Rollback()
-	// 	}
-	// }()
-	// if err = database.DB.Model(&sq).Where("id = ?", id).Updates(qUpdate).Error; err != nil {
-	// 	tx.Rollback()
-	// 	return err
-	// }
-	// tx.Commit()
-	return nil
-}
-
-func (SecQuestion) Delete(m *model.SecQuestion) (err error) {
-	if err = database.DB.Delete(&m).Error; err != nil {
+func (SecQuestion) Delete(id string) error {
+	if err := database.DB.Where("id = ?", id).Delete(&model.Category{}).Error; err != nil {
 		return err
 	}
 	return nil
